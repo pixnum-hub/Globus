@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Globus</title>
+<meta name="theme-color" content="#0b0e14">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Globus">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--r:16px;--bw:1px}
+  [data-theme="dark"]{--bg:#0b0e14;--surface:#121826;--surface2:#1a2233;--text:#e9edf4;--muted:#8d97ab;--accent:#f5b942;--border:#232c3d;--day:#f5b942;--night:#5b7fff;--shadow:0 8px 24px rgba(0,0,0,.35)}
+  [data-theme="light"]{--bg:#f5f3ee;--surface:#ffffff;--surface2:#efebe1;--text:#201d17;--muted:#6d6656;--accent:#b9790f;--border:#e2ddd0;--day:#e0a300;--night:#3955c4;--shadow:0 8px 20px rgba(60,50,20,.08)}
+  [data-theme="oled"]{--bg:#000000;--surface:#0a0a0a;--surface2:#141414;--text:#f2f2f2;--muted:#8a8a8a;--accent:#ffcc4d;--border:#1e1e1e;--day:#ffcc4d;--night:#6f8dff;--shadow:none}
+  [data-theme="hc"]{--bg:#000000;--surface:#000000;--surface2:#000000;--text:#ffffff;--muted:#ffffff;--accent:#ffff00;--border:#ffffff;--day:#ffff00;--night:#00e5ff;--shadow:none;--bw:2px}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;transition:background .25s,color .25s;-webkit-tap-highlight-color:transparent}
+  .app{flex:1;display:flex;flex-direction:column;max-width:1100px;margin:0 auto;width:100%;padding:1.1rem 1rem 0}
+  header{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem;padding-right:12.5rem}
+  @media(max-width:420px){
+    header{padding-right:10.5rem}
+    .theme-toggle{gap:.2rem;padding:.25rem}
+    .theme-toggle button{width:1.8rem;height:1.8rem;font-size:.85rem}
+  }
+  .brand{display:flex;flex-direction:column;line-height:1.15}
+  .brand small{color:var(--muted);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase}
+  h1{font-family:'Inter',sans-serif;font-size:2rem;font-weight:700;margin:0;letter-spacing:-.02em}
+  @media(min-width:560px){h1{font-size:2.5rem}}
+  .theme-toggle{position:fixed;top:calc(.75rem + env(safe-area-inset-top,0px));right:calc(.75rem + env(safe-area-inset-right,0px));z-index:50;display:flex;gap:.35rem;background:var(--surface);border:var(--bw) solid var(--border);border-radius:999px;padding:.3rem;box-shadow:var(--shadow)}
+  .theme-toggle button{border:none;background:transparent;color:var(--muted);width:2.1rem;height:2.1rem;border-radius:999px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:background .2s,color .2s}
+  .theme-toggle button[aria-pressed="true"]{background:var(--accent);color:#111}
+  .theme-toggle button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap;margin-bottom:.8rem}
+  .toggle-group{display:flex;gap:.35rem;background:var(--surface);border:var(--bw) solid var(--border);border-radius:999px;padding:.3rem}
+  .toggle-group button{border:none;background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.03em;padding:.4rem .7rem;border-radius:999px;cursor:pointer;transition:background .2s,color .2s}
+  .toggle-group button[aria-pressed="true"]{background:var(--accent);color:#111}
+  .edit-toggle{display:flex;align-items:center;gap:.5rem;background:var(--surface);border:var(--bw) solid var(--border);border-radius:999px;padding:.3rem .3rem .3rem .9rem;font-size:.78rem;color:var(--muted);cursor:pointer;user-select:none}
+  .edit-toggle .switch{position:relative;width:2.3rem;height:1.3rem;background:var(--surface2);border:var(--bw) solid var(--border);border-radius:999px;flex-shrink:0}
+  .edit-toggle .switch::after{content:"";position:absolute;top:50%;left:.15rem;width:.9rem;height:.9rem;border-radius:50%;background:var(--muted);transform:translateY(-50%);transition:left .18s,background .18s}
+  .edit-toggle[aria-pressed="true"] .switch{background:var(--accent)}
+  .edit-toggle[aria-pressed="true"] .switch::after{left:1.15rem;background:#111}
+  .edit-toggle[aria-pressed="true"]{color:var(--text)}
+  #pauseIcon{font-size:1rem;line-height:1}
+  #pauseToggle[aria-pressed="true"] #pauseIcon{color:var(--accent)}
+  .toolbar-row{display:flex;gap:.5rem;flex-wrap:wrap}
+  .home-bar{display:flex;align-items:center;gap:.6rem;background:var(--surface);border:var(--bw) solid var(--border);border-radius:12px;padding:.5rem .7rem;margin-bottom:.8rem;font-size:.82rem;color:var(--muted)}
+  .home-bar select{flex:1;padding:.4rem .5rem;font-size:.82rem}
+  select,.autocomplete input{font-family:'Inter',sans-serif;font-size:.9rem;background:var(--surface);color:var(--text);border:var(--bw) solid var(--border);border-radius:10px;padding:.6rem .7rem;width:100%}
+  .add-city{display:none;margin-bottom:1.1rem}
+  .app.editing .add-city{display:block}
+  .autocomplete{position:relative}
+  .ac-list{position:absolute;top:110%;left:0;right:0;background:var(--surface);border:var(--bw) solid var(--border);border-radius:10px;max-height:240px;overflow:auto;z-index:20;display:none;box-shadow:var(--shadow)}
+  .ac-list.show{display:block}
+  .ac-item{padding:.55rem .7rem;cursor:pointer;font-size:.85rem;display:flex;gap:.45rem;align-items:center}
+  .ac-item:hover{background:var(--surface2)}
+  .ac-item .muted{color:var(--muted);font-size:.72rem;margin-left:auto}
+  .compare-panel{display:none;flex-direction:column;gap:.6rem;background:var(--surface);border:var(--bw) solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:1.1rem}
+  .app.comparing .compare-panel{display:flex}
+  .compare-row{display:flex;align-items:center;gap:.6rem}
+  .compare-row select{flex:1}
+  .compare-row .vs{color:var(--muted);font-family:'Inter',sans-serif;font-size:.72rem;flex:0 0 auto}
+  .compare-result{font-family:'Inter',sans-serif;font-size:.92rem;text-align:center;padding-top:.5rem;border-top:var(--bw) solid var(--border)}
+  .compare-result strong{color:var(--accent)}
+  .grid{display:grid;grid-template-columns:1fr;gap:.85rem;padding-bottom:2rem}
+  @media(min-width:560px){.grid{grid-template-columns:1fr 1fr}}
+  @media(min-width:900px){.grid{grid-template-columns:1fr 1fr 1fr}}
+  .card{background:color-mix(in srgb, var(--band,var(--surface)) 9%, var(--surface));border:var(--bw) solid var(--border);border-radius:var(--r);padding:1rem 1.1rem 1.1rem;box-shadow:var(--shadow);position:relative;transition:background .4s}
+  [data-theme="hc"] .card{background:var(--surface) !important}
+  .card[draggable="true"]{cursor:grab}
+  .card.dragging{opacity:.4}
+  .card .remove{display:none;position:absolute;top:.6rem;right:.6rem;background:transparent;border:none;color:var(--muted);font-size:1rem;cursor:pointer;line-height:1;padding:.2rem .4rem;border-radius:6px}
+  .app.editing .card .remove{display:block}
+  .card .remove:hover{color:var(--text);background:var(--surface2)}
+  .analog-toggle{position:absolute;top:.6rem;right:2.1rem;background:transparent;border:none;color:var(--muted);font-size:.95rem;cursor:pointer;line-height:1;padding:.2rem .3rem;border-radius:6px}
+  .analog-toggle:hover{color:var(--text);background:var(--surface2)}
+  .ambient-toggle{position:absolute;top:.6rem;right:3.6rem;background:transparent;border:none;color:var(--muted);font-size:.95rem;cursor:pointer;line-height:1;padding:.2rem .3rem;border-radius:6px}
+  .ambient-toggle:hover{color:var(--text);background:var(--surface2)}
+  .ambient-toggle[aria-pressed="true"]{color:var(--accent)}
+  .place{display:flex;align-items:baseline;gap:.45rem;margin-bottom:.15rem;padding-right:4.1rem}
+  .place .flag{font-size:1.15rem}
+  .place .city{font-weight:700;font-size:1.02rem}
+  .place .country{color:var(--muted);font-size:.78rem}
+  .time{font-family:'Inter',sans-serif;font-size:2.1rem;font-weight:700;font-variant-numeric:tabular-nums;margin:.15rem 0 .1rem;letter-spacing:.01em}
+  .time{display:inline-flex;align-items:center}
+  .time .d2{display:inline-block;width:1.15em;overflow:visible;text-align:center;line-height:1}
+  .time .ms{display:inline-block;width:2.6em;overflow:visible;text-align:left;font-size:.5em;font-weight:600;color:var(--muted);letter-spacing:0;line-height:1}
+  .time .ampm{display:inline-block;font-size:.42em;font-weight:700;color:var(--accent);letter-spacing:.03em;margin-left:.1em;line-height:1}
+  .app.wide-digits .time .d2{width:1.7em}
+  .app.wide-digits .time .ms{width:3.6em}
+  .analog-face{display:none;position:relative;width:104px;height:104px;border-radius:50%;border:3px solid var(--border);margin:.4rem auto .2rem;background:var(--surface2)}
+  .card.analog .analog-face{display:block}
+  .card.analog .time{display:none}
+  .analog-face::after{content:"";position:absolute;top:6px;left:50%;width:4px;height:7px;background:var(--muted);transform:translateX(-50%);z-index:1}
+  .analog-face .hand{position:absolute;top:50%;left:50%;transform-origin:50% 100%;background:var(--text);border-radius:3px;z-index:2}
+  .analog-face .hour{width:5px;height:28px;margin:-28px 0 0 -2.5px}
+  .analog-face .minute{width:4px;height:39px;margin:-39px 0 0 -2px}
+  .analog-face .second{width:2px;height:43px;margin:-43px 0 0 -1px;background:var(--accent);z-index:3}
+  .analog-face .center{position:absolute;left:50%;top:50%;width:9px;height:9px;background:var(--accent);border-radius:50%;transform:translate(-50%,-50%);z-index:4;box-shadow:0 0 0 2px var(--surface2)}
+  .sub{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:.78rem;margin-bottom:.5rem}
+  .badge{font-family:'Inter',sans-serif;background:var(--surface2);padding:.15rem .45rem;border-radius:6px;font-size:.72rem}
+  .distance{font-size:.72rem;color:var(--muted);margin-bottom:.55rem}
+  .holiday{font-size:.74rem;font-weight:600;color:var(--accent);background:color-mix(in srgb, var(--accent) 15%, var(--surface));border-radius:6px;padding:.25rem .5rem;margin-bottom:.4rem}
+  .tide{font-size:.72rem;color:var(--muted);margin-bottom:.4rem}
+  .daybar{height:5px;border-radius:3px;background:linear-gradient(90deg,var(--night),var(--day) 50%,var(--night));position:relative;margin-top:.4rem}
+  .daybar .dot{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;background:var(--text);border:2px solid var(--surface);transform:translate(-50%,-50%)}
+  .daynight{font-size:.72rem;color:var(--muted);margin-top:.4rem;display:flex;align-items:center;gap:.3rem}
+  footer{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.4rem;padding:1.1rem 1rem;border-top:var(--bw) solid var(--border);color:var(--muted);font-size:.78rem}
+  footer p{margin:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.35rem;min-height:1.4rem}
+  footer button{background:none;border:none;color:inherit;text-decoration:underline;cursor:pointer;font:inherit;padding:0}
+  @media(prefers-reduced-motion:no-preference){.card{transition:transform .15s,background .4s}.card:hover{transform:translateY(-2px)}}
+  .app.low-power .card{transition:none !important}
+  .app.low-power .card:hover{transform:none}
+</style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand"><small id="liveLabel">Live &middot; synced</small><h1 id="appTitle">Globus</h1></div>
+      <div class="theme-toggle" role="group" aria-label="Theme">
+        <button data-theme-btn="dark" aria-pressed="true" title="Dark">&#9789;</button>
+        <button data-theme-btn="light" aria-pressed="false" title="Light">&#9728;</button>
+        <button data-theme-btn="oled" aria-pressed="false" title="OLED True Black">&#9679;</button>
+        <button data-theme-btn="hc" aria-pressed="false" title="High Contrast">&#9673;</button>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <div class="toggle-group" role="group" aria-label="Time format">
+        <button data-format-btn="24" aria-pressed="false">24H</button>
+        <button data-format-btn="12" aria-pressed="true">12H</button>
+      </div>
+      <button class="edit-toggle" id="pauseToggle" aria-pressed="false">
+        <span id="pauseIcon" aria-hidden="true">&#9208;</span>
+        <span id="pauseLabel">Pause</span>
+      </button>
+      <div class="toolbar-row">
+        <button class="edit-toggle" id="compareToggle" aria-pressed="false">
+          <span class="switch" aria-hidden="true"></span>
+          <span id="compareLabel">Compare cities</span>
+        </button>
+        <button class="edit-toggle" id="editToggle" aria-pressed="false">
+          <span class="switch" aria-hidden="true"></span>
+          <span id="editLabel">Add / remove / reorder</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <select id="langSelect" aria-label="Language" style="width:auto;flex:0 0 auto;padding:.4rem .5rem;font-size:.78rem;max-width:8rem">
+        <optgroup label="World">
+          <option value="en">English</option>
+          <option value="es">Espa&#241;ol</option>
+          <option value="fr">Fran&#231;ais</option>
+          <option value="de">Deutsch</option>
+          <option value="pt">Portugu&#234;s</option>
+          <option value="ru">&#1056;&#1091;&#1089;&#1089;&#1082;&#1080;&#1081;</option>
+          <option value="zh">&#20013;&#25991;</option>
+          <option value="ja">&#26085;&#26412;&#35486;</option>
+          <option value="ar">&#1575;&#1604;&#1593;&#1585;&#1576;&#1610;&#1577;</option>
+          <option value="ko">&#54620;&#44397;&#50612;</option>
+          <option value="it">Italiano</option>
+        </optgroup>
+        <optgroup label="Indian">
+          <option value="hi">&#2361;&#2367;&#2344;&#2381;&#2342;&#2368;</option>
+          <option value="bn">&#2476;&#2494;&#2434;&#2482;&#2494;</option>
+          <option value="ta">&#2980;&#2990;&#3007;&#2996;&#3021;</option>
+          <option value="te">&#3108;&#3142;&#3122;&#3137;&#3095;&#3137;</option>
+          <option value="mr">&#2350;&#2352;&#2366;&#2336;&#2368;</option>
+          <option value="gu">&#2711;&#2753;&#2716;&#2736;&#2750;&#2724;&#2752;</option>
+          <option value="kn">&#3221;&#3240;&#3277;&#3240;&#3233;</option>
+          <option value="ml">&#3374;&#3378;&#3375;&#3390;&#3379;&#3330;</option>
+          <option value="pa">&#2602;&#2672;&#2588;&#2622;&#2604;&#2624;</option>
+          <option value="ur">&#1575;&#1585;&#1583;&#1608;</option>
+          <option value="or">&#2835;&#2849;&#2876;&#2879;&#2822;</option>
+        </optgroup>
+      </select>
+      <div class="edit-toggle" style="cursor:default;padding:6px 10px">
+        <span aria-hidden="true">Aa</span>
+        <input type="range" id="fontSize" min="15" max="130" step="5" value="100" aria-label="Text size" style="width:80px">
+        <span id="fontSizeReadout" style="min-width:2.4em;font-variant-numeric:tabular-nums">100%</span>
+      </div>
+      <button class="edit-toggle" id="lowPowerToggle" aria-pressed="false">
+        <span class="switch" aria-hidden="true"></span>
+        <span id="lowPowerLabel">Low-power mode</span>
+      </button>
+    </div>
+
+    <div class="home-bar">
+      <span>&#128205; Home base</span>
+      <select id="homeSelect" aria-label="Home city for distance calculations"></select>
+    </div>
+
+    <div class="home-bar" id="moonBar">&#127761; --</div>
+
+    <div class="compare-panel" id="comparePanel">
+      <div class="compare-row">
+        <select id="cmpA" aria-label="First city"></select>
+        <span class="vs">VS</span>
+        <select id="cmpB" aria-label="Second city"></select>
+      </div>
+      <div class="compare-result" id="cmpResult">--</div>
+      <div class="compare-result" id="cmpOverlap">--</div>
+      <div class="compare-result" id="cmpJetlag">--</div>
+    </div>
+
+    <div class="add-city">
+      <div class="autocomplete">
+        <input type="text" id="citySearch" placeholder="Search & tap a city to add..." autocomplete="off">
+        <div class="ac-list" id="acList"></div>
+      </div>
+    </div>
+
+    <main class="grid" id="grid" aria-live="polite"></main>
+
+    <footer>
+      <p>
+        <span>&copy; Manik Roy</span>
+        <span><span id="year"></span>.</span>
+        <span id="rightsLabel">All Rights Reserved.</span>
+      </p>
+      <p>
+        <button id="exportBtn">Export my data</button>
+        <span aria-hidden="true">&middot;</span>
+        <button id="deleteBtn">Delete my data</button>
+      </p>
+    </footer>
+  </div>
+
+<script>
+// city, country, IANA zone, ISO country code, region, lat, lng
+const RAW_CITIES = [
+["New York","USA","America/New_York","US","North America",40.71,-74.01],
+["Los Angeles","USA","America/Los_Angeles","US","North America",34.05,-118.24],
+["Chicago","USA","America/Chicago","US","North America",41.88,-87.63],
+["Houston","USA","America/Chicago","US","North America",29.76,-95.37],
+["San Francisco","USA","America/Los_Angeles","US","North America",37.77,-122.42],
+["Miami","USA","America/New_York","US","North America",25.76,-80.19],
+["Seattle","USA","America/Los_Angeles","US","North America",47.61,-122.33],
+["Boston","USA","America/New_York","US","North America",42.36,-71.06],
+["Washington D.C.","USA","America/New_York","US","North America",38.91,-77.04],
+["Denver","USA","America/Denver","US","North America",39.74,-104.99],
+["Honolulu","USA","Pacific/Honolulu","US","North America",21.31,-157.86],
+["Toronto","Canada","America/Toronto","CA","North America",43.65,-79.38],
+["Vancouver","Canada","America/Vancouver","CA","North America",49.28,-123.12],
+["Montreal","Canada","America/Toronto","CA","North America",45.50,-73.57],
+["Mexico City","Mexico","America/Mexico_City","MX","North America",19.43,-99.13],
+["S\u00E3o Paulo","Brazil","America/Sao_Paulo","BR","South America",-23.55,-46.63],
+["Rio de Janeiro","Brazil","America/Sao_Paulo","BR","South America",-22.91,-43.17],
+["Buenos Aires","Argentina","America/Argentina/Buenos_Aires","AR","South America",-34.60,-58.38],
+["Santiago","Chile","America/Santiago","CL","South America",-33.45,-70.65],
+["Lima","Peru","America/Lima","PE","South America",-12.05,-77.04],
+["Bogot\u00E1","Colombia","America/Bogota","CO","South America",4.71,-74.07],
+["Caracas","Venezuela","America/Caracas","VE","South America",10.48,-66.90],
+["London","UK","Europe/London","GB","Europe",51.51,-0.13],
+["Paris","France","Europe/Paris","FR","Europe",48.85,2.35],
+["Berlin","Germany","Europe/Berlin","DE","Europe",52.52,13.40],
+["Madrid","Spain","Europe/Madrid","ES","Europe",40.42,-3.70],
+["Rome","Italy","Europe/Rome","IT","Europe",41.90,12.50],
+["Amsterdam","Netherlands","Europe/Amsterdam","NL","Europe",52.37,4.90],
+["Brussels","Belgium","Europe/Brussels","BE","Europe",50.85,4.35],
+["Vienna","Austria","Europe/Vienna","AT","Europe",48.21,16.37],
+["Zurich","Switzerland","Europe/Zurich","CH","Europe",47.38,8.54],
+["Dublin","Ireland","Europe/Dublin","IE","Europe",53.35,-6.26],
+["Lisbon","Portugal","Europe/Lisbon","PT","Europe",38.72,-9.14],
+["Stockholm","Sweden","Europe/Stockholm","SE","Europe",59.33,18.07],
+["Oslo","Norway","Europe/Oslo","NO","Europe",59.91,10.75],
+["Copenhagen","Denmark","Europe/Copenhagen","DK","Europe",55.68,12.57],
+["Helsinki","Finland","Europe/Helsinki","FI","Europe",60.17,24.94],
+["Warsaw","Poland","Europe/Warsaw","PL","Europe",52.23,21.01],
+["Prague","Czechia","Europe/Prague","CZ","Europe",50.08,14.44],
+["Budapest","Hungary","Europe/Budapest","HU","Europe",47.50,19.04],
+["Athens","Greece","Europe/Athens","GR","Europe",37.98,23.73],
+["Kyiv","Ukraine","Europe/Kyiv","UA","Europe",50.45,30.52],
+["Istanbul","T\u00FCrkiye","Europe/Istanbul","TR","Europe",41.01,28.98],
+["Moscow","Russia","Europe/Moscow","RU","Europe",55.76,37.62],
+["Dubai","UAE","Asia/Dubai","AE","Middle East & Africa",25.20,55.27],
+["Abu Dhabi","UAE","Asia/Dubai","AE","Middle East & Africa",24.45,54.38],
+["Doha","Qatar","Asia/Qatar","QA","Middle East & Africa",25.29,51.53],
+["Riyadh","Saudi Arabia","Asia/Riyadh","SA","Middle East & Africa",24.71,46.68],
+["Tel Aviv","Israel","Asia/Jerusalem","IL","Middle East & Africa",32.08,34.78],
+["Amman","Jordan","Asia/Amman","JO","Middle East & Africa",31.95,35.93],
+["Cairo","Egypt","Africa/Cairo","EG","Middle East & Africa",30.04,31.24],
+["Lagos","Nigeria","Africa/Lagos","NG","Middle East & Africa",6.52,3.38],
+["Nairobi","Kenya","Africa/Nairobi","KE","Middle East & Africa",-1.29,36.82],
+["Johannesburg","South Africa","Africa/Johannesburg","ZA","Middle East & Africa",-26.20,28.05],
+["Cape Town","South Africa","Africa/Johannesburg","ZA","Middle East & Africa",-33.92,18.42],
+["Casablanca","Morocco","Africa/Casablanca","MA","Middle East & Africa",33.57,-7.59],
+["Mumbai","India","Asia/Kolkata","IN","India",19.08,72.88],
+["Kolkata","India","Asia/Kolkata","IN","India",22.57,88.36],
+["Delhi","India","Asia/Kolkata","IN","India",28.61,77.21],
+["Bengaluru","India","Asia/Kolkata","IN","India",12.97,77.59],
+["Chennai","India","Asia/Kolkata","IN","India",13.08,80.27],
+["Hyderabad","India","Asia/Kolkata","IN","India",17.39,78.49],
+["Pune","India","Asia/Kolkata","IN","India",18.52,73.86],
+["Ahmedabad","India","Asia/Kolkata","IN","India",23.02,72.57],
+["Jaipur","India","Asia/Kolkata","IN","India",26.91,75.79],
+["Surat","India","Asia/Kolkata","IN","India",21.17,72.83],
+["Lucknow","India","Asia/Kolkata","IN","India",26.85,80.95],
+["Kanpur","India","Asia/Kolkata","IN","India",26.45,80.33],
+["Nagpur","India","Asia/Kolkata","IN","India",21.15,79.09],
+["Indore","India","Asia/Kolkata","IN","India",22.72,75.86],
+["Thane","India","Asia/Kolkata","IN","India",19.22,72.98],
+["Bhopal","India","Asia/Kolkata","IN","India",23.26,77.41],
+["Visakhapatnam","India","Asia/Kolkata","IN","India",17.69,83.22],
+["Patna","India","Asia/Kolkata","IN","India",25.59,85.14],
+["Vadodara","India","Asia/Kolkata","IN","India",22.31,73.18],
+["Ghaziabad","India","Asia/Kolkata","IN","India",28.67,77.42],
+["Ludhiana","India","Asia/Kolkata","IN","India",30.90,75.86],
+["Agra","India","Asia/Kolkata","IN","India",27.18,78.02],
+["Nashik","India","Asia/Kolkata","IN","India",20.00,73.79],
+["Faridabad","India","Asia/Kolkata","IN","India",28.41,77.32],
+["Meerut","India","Asia/Kolkata","IN","India",28.98,77.71],
+["Rajkot","India","Asia/Kolkata","IN","India",22.30,70.80],
+["Varanasi","India","Asia/Kolkata","IN","India",25.32,82.97],
+["Srinagar","India","Asia/Kolkata","IN","India",34.08,74.80],
+["Amritsar","India","Asia/Kolkata","IN","India",31.63,74.87],
+["Chandigarh","India","Asia/Kolkata","IN","India",30.73,76.78],
+["Guwahati","India","Asia/Kolkata","IN","India",26.14,91.74],
+["Dhaka","Bangladesh","Asia/Dhaka","BD","South Asia",23.81,90.41],
+["Karachi","Pakistan","Asia/Karachi","PK","South Asia",24.86,67.01],
+["Islamabad","Pakistan","Asia/Karachi","PK","South Asia",33.68,73.05],
+["Kathmandu","Nepal","Asia/Kathmandu","NP","South Asia",27.72,85.32],
+["Bangkok","Thailand","Asia/Bangkok","TH","East & Southeast Asia",13.76,100.50],
+["Singapore","Singapore","Asia/Singapore","SG","East & Southeast Asia",1.35,103.82],
+["Kuala Lumpur","Malaysia","Asia/Kuala_Lumpur","MY","East & Southeast Asia",3.14,101.69],
+["Jakarta","Indonesia","Asia/Jakarta","ID","East & Southeast Asia",-6.21,106.85],
+["Manila","Philippines","Asia/Manila","PH","East & Southeast Asia",14.60,120.98],
+["Ho Chi Minh City","Vietnam","Asia/Ho_Chi_Minh","VN","East & Southeast Asia",10.78,106.70],
+["Hanoi","Vietnam","Asia/Ho_Chi_Minh","VN","East & Southeast Asia",21.03,105.85],
+["Hong Kong","China","Asia/Hong_Kong","HK","East & Southeast Asia",22.32,114.17],
+["Shanghai","China","Asia/Shanghai","CN","East & Southeast Asia",31.23,121.47],
+["Beijing","China","Asia/Shanghai","CN","East & Southeast Asia",39.90,116.41],
+["Shenzhen","China","Asia/Shanghai","CN","East & Southeast Asia",22.54,114.06],
+["Guangzhou","China","Asia/Shanghai","CN","East & Southeast Asia",23.13,113.26],
+["Taipei","Taiwan","Asia/Taipei","TW","East & Southeast Asia",25.03,121.57],
+["Seoul","South Korea","Asia/Seoul","KR","East & Southeast Asia",37.57,126.98],
+["Tokyo","Japan","Asia/Tokyo","JP","East & Southeast Asia",35.68,139.65],
+["Osaka","Japan","Asia/Tokyo","JP","East & Southeast Asia",34.69,135.50],
+["Yangon","Myanmar","Asia/Yangon","MM","East & Southeast Asia",16.87,96.20],
+["Phnom Penh","Cambodia","Asia/Phnom_Penh","KH","East & Southeast Asia",11.56,104.92],
+["Vientiane","Laos","Asia/Vientiane","LA","East & Southeast Asia",17.97,102.63],
+["Ulaanbaatar","Mongolia","Asia/Ulaanbaatar","MN","East & Southeast Asia",47.89,106.91],
+["Tashkent","Uzbekistan","Asia/Tashkent","UZ","Central Asia",41.30,69.24],
+["Almaty","Kazakhstan","Asia/Almaty","KZ","Central Asia",43.24,76.90],
+["Baku","Azerbaijan","Asia/Baku","AZ","Central Asia",40.41,49.87],
+["Tbilisi","Georgia","Asia/Tbilisi","GE","Central Asia",41.72,44.79],
+["Sydney","Australia","Australia/Sydney","AU","Oceania",-33.87,151.21],
+["Melbourne","Australia","Australia/Melbourne","AU","Oceania",-37.81,144.96],
+["Brisbane","Australia","Australia/Brisbane","AU","Oceania",-27.47,153.03],
+["Perth","Australia","Australia/Perth","AU","Oceania",-31.95,115.86],
+["Adelaide","Australia","Australia/Adelaide","AU","Oceania",-34.93,138.60],
+["Auckland","New Zealand","Pacific/Auckland","NZ","Oceania",-36.85,174.76],
+["Wellington","New Zealand","Pacific/Auckland","NZ","Oceania",-41.29,174.78],
+["Suva","Fiji","Pacific/Fiji","FJ","Oceania",-18.14,178.44],
+["Port Moresby","Papua New Guinea","Pacific/Port_Moresby","PG","Oceania",-9.44,147.18],
+["Noum\u00E9a","New Caledonia","Pacific/Noumea","NC","Oceania",-22.28,166.46],
+];
+
+function flagEmoji(cc){
+  return [...cc.toUpperCase()].map(ch => String.fromCodePoint(127397 + ch.charCodeAt(0))).join('');
+}
+const CITIES = RAW_CITIES.map(([city,country,zone,cc,region,lat,lng], id) => ({
+  id, city, country, zone, region, lat, lng, cc, flag: flagEmoji(cc)
+}));
+
+const DEFAULT_ACTIVE = ["Kolkata","London","New York","Tokyo","Sydney"];
+// Curated coastal cities eligible for the approximate tide indicator
+const COASTAL = new Set(["New York","Los Angeles","San Francisco","Miami","Seattle","Boston","Honolulu","Vancouver",
+  "Rio de Janeiro","Buenos Aires","Lima","London","Lisbon","Dublin","Amsterdam","Copenhagen","Stockholm","Helsinki",
+  "Athens","Istanbul","Dubai","Doha","Tel Aviv","Lagos","Cape Town","Casablanca","Mumbai","Chennai","Kolkata",
+  "Visakhapatnam","Karachi","Dhaka","Bangkok","Singapore","Jakarta","Manila","Ho Chi Minh City","Hong Kong",
+  "Shanghai","Shenzhen","Guangzhou","Taipei","Tokyo","Osaka","Yangon","Sydney","Melbourne","Brisbane","Perth",
+  "Adelaide","Auckland","Wellington","Suva","Port Moresby","Noum\u00E9a"]);
+let active = CITIES.filter(c => DEFAULT_ACTIVE.includes(c.city));
+let serverOffsetMs = 0;
+let use12h = true, editMode = false, compareMode = false, running = true;
+let uiLang = 'en', lowPower = false, fontScale = 100;
+let tickTimer = null;
+const LOCALES = {en:'en-GB-u-nu-latn', es:'es-ES-u-nu-latn', fr:'fr-FR-u-nu-latn', hi:'hi-IN-u-nu-latn', bn:'bn-BD-u-nu-latn',
+  ta:'ta-IN-u-nu-latn', te:'te-IN-u-nu-latn', mr:'mr-IN-u-nu-latn', gu:'gu-IN-u-nu-latn', kn:'kn-IN-u-nu-latn',
+  ml:'ml-IN-u-nu-latn', pa:'pa-IN-u-nu-latn', ur:'ur-PK-u-nu-latn', or:'or-IN-u-nu-latn',
+  de:'de-DE-u-nu-latn', pt:'pt-PT-u-nu-latn', ru:'ru-RU-u-nu-latn', zh:'zh-CN-u-nu-latn', ja:'ja-JP-u-nu-latn',
+  ar:'ar-SA-u-nu-latn', ko:'ko-KR-u-nu-latn', it:'it-IT-u-nu-latn'};
+// Same locales but WITHOUT forcing Latin numerals \u2014 used only for what's actually shown
+// on screen (the clock face and date row), so Hindi/Bengali render native digits.
+const DISPLAY_LOCALES = {en:'en-GB', es:'es-ES', fr:'fr-FR', hi:'hi-IN-u-nu-deva', bn:'bn-BD-u-nu-beng',
+  ta:'ta-IN-u-nu-tamldec', te:'te-IN-u-nu-telu', mr:'mr-IN-u-nu-deva', gu:'gu-IN-u-nu-gujr', kn:'kn-IN-u-nu-knda',
+  ml:'ml-IN-u-nu-mlym', pa:'pa-IN-u-nu-guru', ur:'ur-PK-u-nu-arabext', or:'or-IN-u-nu-orya',
+  de:'de-DE', pt:'pt-PT', ru:'ru-RU', zh:'zh-CN', ja:'ja-JP', ar:'ar-SA-u-nu-arab', ko:'ko-KR', it:'it-IT'};
+const NATIVE_DIGIT_LANGS = new Set(['hi','bn','ta','te','mr','gu','kn','ml','pa','ur','or','ar']);
+const I18N = {
+  en:{title:'Globus', live:'Live \u00B7 synced', pause:'Pause', resume:'Resume', compare:'Compare cities', hideCompare:'Hide comparison', edit:'Add / remove / reorder', done:'Done editing', home:'Home base', search:'Search & tap a city to add...', lowpower:'Low-power mode', exportBtn:'Export my data', deleteBtn:'Delete my data', rights:'All Rights Reserved'},
+  es:{title:'Globus', live:'En vivo \u00B7 sincronizado', pause:'Pausar', resume:'Reanudar', compare:'Comparar ciudades', hideCompare:'Ocultar comparaci\u00F3n', edit:'A\u00F1adir / quitar / reordenar', done:'Listo', home:'Ciudad base', search:'Buscar y a\u00F1adir una ciudad...', lowpower:'Modo ahorro', exportBtn:'Exportar mis datos', deleteBtn:'Eliminar mis datos', rights:'Todos los derechos reservados'},
+  fr:{title:'Globus', live:'En direct \u00B7 synchronis\u00E9', pause:'Pause', resume:'Reprendre', compare:'Comparer les villes', hideCompare:'Masquer la comparaison', edit:'Ajouter / supprimer / r\u00E9organiser', done:'Termin\u00E9', home:'Ville de base', search:'Rechercher une ville...', lowpower:'Mode \u00E9conomie', exportBtn:'Exporter mes donn\u00E9es', deleteBtn:'Supprimer mes donn\u00E9es', rights:'Tous droits r\u00E9serv\u00E9s'},
+  hi:{title:'\u0917\u094D\u0932\u094B\u092C\u0938', live:'\u0932\u093E\u0907\u0935 \u00B7 \u0938\u093F\u0902\u0915', pause:'\u0930\u094B\u0915\u0947\u0902', resume:'\u091C\u093E\u0930\u0940 \u0930\u0916\u0947\u0902', compare:'\u0936\u0939\u0930\u094B\u0902 \u0915\u0940 \u0924\u0941\u0932\u0928\u093E \u0915\u0930\u0947\u0902', hideCompare:'\u0924\u0941\u0932\u0928\u093E \u091B\u093F\u092A\u093E\u090F\u0901', edit:'\u091C\u094B\u0921\u093C\u0947\u0902 / \u0939\u091F\u093E\u090F\u0901 / \u0915\u094D\u0930\u092E \u092C\u0926\u0932\u0947\u0902', done:'\u092A\u0942\u0930\u094D\u0923', home:'\u0918\u0930 \u0936\u0939\u0930', search:'\u0936\u0939\u0930 \u0916\u094B\u091C\u0947\u0902...', lowpower:'\u0932\u094B \u092A\u093E\u0935\u0930 \u092E\u094B\u0921', exportBtn:'\u092E\u0947\u0930\u093E \u0921\u0947\u091F\u093E \u0928\u093F\u0930\u094D\u092F\u093E\u0924 \u0915\u0930\u0947\u0902', deleteBtn:'\u092E\u0947\u0930\u093E \u0921\u0947\u091F\u093E \u0939\u091F\u093E\u090F\u0901', rights:'\u0938\u0930\u094D\u0935\u093E\u0927\u093F\u0915\u093E\u0930 \u0938\u0941\u0930\u0915\u094D\u0937\u093F\u0924'},
+  bn:{title:'\u0997\u09CD\u09B2\u09CB\u09AC\u09BE\u09B8', live:'\u09B2\u09BE\u0987\u09AD \u00B7 \u09B8\u09BF\u0999\u09CD\u0995', pause:'\u09AC\u09BF\u09B0\u09A4\u09BF', resume:'\u099A\u09BE\u09B2\u09C1', compare:'\u09B6\u09B9\u09B0 \u09A4\u09C1\u09B2\u09A8\u09BE \u0995\u09B0\u09C1\u09A8', hideCompare:'\u09A4\u09C1\u09B2\u09A8\u09BE \u09B2\u09C1\u0995\u09BE\u09A8', edit:'\u09AF\u09CB\u0997/\u09AC\u09BF\u09AF\u09BC\u09CB\u0997/\u09AA\u09C1\u09A8\u0983\u0995\u09CD\u09B0\u09AE', done:'\u09B8\u09AE\u09CD\u09AA\u09A8\u09CD\u09A8', home:'\u09B9\u09CB\u09AE \u09B6\u09B9\u09B0', search:'\u09B6\u09B9\u09B0 \u0996\u09C1\u0981\u099C\u09C1\u09A8...', lowpower:'\u09B2\u09CB \u09AA\u09BE\u0993\u09AF\u09BC\u09BE\u09B0 \u09AE\u09CB\u09A1', exportBtn:'\u09A1\u09C7\u099F\u09BE \u09B0\u09AB\u09A4\u09BE\u09A8\u09BF', deleteBtn:'\u09A1\u09C7\u099F\u09BE \u09AE\u09C1\u09B2\u09C1\u09A8', rights:'\u09B8\u0995\u09B2 \u09B8\u09CD\u09AC\u09A4\u09CD\u09AC \u09B8\u0982\u09B0\u0995\u09CD\u09B7\u09BF\u09A4'},
+  ta:{title:'\u0B95\u0BC1\u0BB3\u0BCB\u0BAA\u0BB8\u0BCD', live:'\u0BA8\u0BC7\u0BB0\u0BB2\u0BC8 \u00B7 \u0B92\u0BA4\u0BCD\u0BA4\u0BBF\u0B9A\u0BC8\u0BB5\u0BC1', pause:'\u0B87\u0B9F\u0BC8\u0BA8\u0BBF\u0BB1\u0BC1\u0BA4\u0BCD\u0BA4\u0BC1', resume:'\u0BA4\u0BCA\u0B9F\u0BB0\u0BCD', compare:'\u0BA8\u0B95\u0BB0\u0B99\u0BCD\u0B95\u0BB3\u0BC8 \u0B92\u0BAA\u0BCD\u0BAA\u0BBF\u0B9F\u0BC1', hideCompare:'\u0B92\u0BAA\u0BCD\u0BAA\u0BC0\u0B9F\u0BCD\u0B9F\u0BC8 \u0BAE\u0BB1\u0BC8', edit:'\u0B9A\u0BC7\u0BB0\u0BCD / \u0BA8\u0BC0\u0B95\u0BCD\u0B95\u0BC1 / \u0BB5\u0BB0\u0BBF\u0B9A\u0BC8\u0BAE\u0BBE\u0BB1\u0BCD\u0BB1\u0BC1', done:'\u0BAE\u0BC1\u0B9F\u0BBF\u0BA8\u0BCD\u0BA4\u0BA4\u0BC1', home:'\u0BB5\u0BC0\u0B9F\u0BCD\u0B9F\u0BC1 \u0BA8\u0B95\u0BB0\u0BAE\u0BCD', search:'\u0BA8\u0B95\u0BB0\u0BA4\u0BCD\u0BA4\u0BC8\u0BA4\u0BCD \u0BA4\u0BC7\u0B9F\u0BBF \u0B9A\u0BC7\u0BB0\u0BCD\u0B95\u0BCD\u0B95\u0BB5\u0BC1\u0BAE\u0BCD...', lowpower:'\u0B95\u0BC1\u0BB1\u0BC8\u0BA8\u0BCD\u0BA4 \u0B86\u0BB1\u0BCD\u0BB1\u0BB2\u0BCD \u0BAA\u0BAF\u0BA9\u0BCD\u0BAE\u0BC1\u0BB1\u0BC8', exportBtn:'\u0B8E\u0BA9\u0BA4\u0BC1 \u0BA4\u0BB0\u0BB5\u0BC8 \u0B8F\u0BB1\u0BCD\u0BB1\u0BC1\u0BAE\u0BA4\u0BBF \u0B9A\u0BC6\u0BAF\u0BCD', deleteBtn:'\u0B8E\u0BA9\u0BA4\u0BC1 \u0BA4\u0BB0\u0BB5\u0BC8 \u0BA8\u0BC0\u0B95\u0BCD\u0B95\u0BC1', rights:'\u0B85\u0BA9\u0BC8\u0BA4\u0BCD\u0BA4\u0BC1 \u0B89\u0BB0\u0BBF\u0BAE\u0BC8\u0B95\u0BB3\u0BC1\u0BAE\u0BCD \u0BAA\u0BBE\u0BA4\u0BC1\u0B95\u0BBE\u0B95\u0BCD\u0B95\u0BAA\u0BCD\u0BAA\u0B9F\u0BCD\u0B9F\u0BB5\u0BC8'},
+  te:{title:'\u0C17\u0C4D\u0C32\u0C4B\u0C2C\u0C38\u0C4D', live:'\u0C2A\u0C4D\u0C30\u0C24\u0C4D\u0C2F\u0C15\u0C4D\u0C37 \u00B7 \u0C38\u0C2E\u0C15\u0C3E\u0C32\u0C40\u0C15\u0C30\u0C3F\u0C02\u0C1A\u0C2C\u0C21\u0C3F\u0C02\u0C26\u0C3F', pause:'\u0C35\u0C3F\u0C30\u0C3E\u0C2E\u0C02', resume:'\u0C15\u0C4A\u0C28\u0C38\u0C3E\u0C17\u0C3F\u0C02\u0C1A\u0C41', compare:'\u0C28\u0C17\u0C30\u0C3E\u0C32\u0C28\u0C41 \u0C2A\u0C4B\u0C32\u0C4D\u0C1A\u0C02\u0C21\u0C3F', hideCompare:'\u0C2A\u0C4B\u0C32\u0C3F\u0C15\u0C28\u0C41 \u0C26\u0C3E\u0C1A\u0C41', edit:'\u0C1C\u0C4B\u0C21\u0C3F\u0C02\u0C1A\u0C41 / \u0C24\u0C40\u0C38\u0C3F\u0C35\u0C47\u0C2F\u0C3F / \u0C15\u0C4D\u0C30\u0C2E\u0C02 \u0C2E\u0C3E\u0C30\u0C4D\u0C1A\u0C41', done:'\u0C2A\u0C42\u0C30\u0C4D\u0C24\u0C2F\u0C3F\u0C02\u0C26\u0C3F', home:'\u0C38\u0C4D\u0C35\u0C38\u0C4D\u0C25\u0C32 \u0C28\u0C17\u0C30\u0C02', search:'\u0C28\u0C17\u0C30\u0C3E\u0C28\u0C4D\u0C28\u0C3F \u0C35\u0C46\u0C24\u0C3F\u0C15\u0C3F \u0C1C\u0C4B\u0C21\u0C3F\u0C02\u0C1A\u0C02\u0C21\u0C3F...', lowpower:'\u0C24\u0C15\u0C4D\u0C15\u0C41\u0C35-\u0C36\u0C15\u0C4D\u0C24\u0C3F \u0C2E\u0C4B\u0C21\u0C4D', exportBtn:'\u0C28\u0C3E \u0C21\u0C47\u0C1F\u0C3E\u0C28\u0C41 \u0C0E\u0C17\u0C41\u0C2E\u0C24\u0C3F \u0C1A\u0C47\u0C2F\u0C02\u0C21\u0C3F', deleteBtn:'\u0C28\u0C3E \u0C21\u0C47\u0C1F\u0C3E\u0C28\u0C41 \u0C24\u0C4A\u0C32\u0C17\u0C3F\u0C02\u0C1A\u0C02\u0C21\u0C3F', rights:'\u0C38\u0C30\u0C4D\u0C35 \u0C39\u0C15\u0C4D\u0C15\u0C41\u0C32\u0C41 \u0C15\u0C32\u0C3F\u0C17\u0C3F \u0C09\u0C28\u0C4D\u0C28\u0C3E\u0C2F\u0C3F'},
+  mr:{title:'\u0917\u094D\u0932\u094B\u092C\u0938', live:'\u0932\u093E\u0907\u0935\u094D\u0939 \u00B7 \u0938\u093F\u0902\u0915\u094D\u0930\u094B\u0928\u093E\u0907\u091D\u094D\u0921', pause:'\u0925\u093E\u0902\u092C\u0935\u093E', resume:'\u0938\u0941\u0930\u0942 \u0920\u0947\u0935\u093E', compare:'\u0936\u0939\u0930\u093E\u0902\u091A\u0940 \u0924\u0941\u0932\u0928\u093E \u0915\u0930\u093E', hideCompare:'\u0924\u0941\u0932\u0928\u093E \u0932\u092A\u0935\u093E', edit:'\u091C\u094B\u0921\u093E / \u0915\u093E\u0922\u093E / \u092A\u0941\u0928\u0930\u094D\u0930\u091A\u0928\u093E \u0915\u0930\u093E', done:'\u092A\u0942\u0930\u094D\u0923 \u091D\u093E\u0932\u0947', home:'\u0939\u094B\u092E \u0936\u0939\u0930', search:'\u0936\u0939\u0930 \u0936\u094B\u0927\u093E \u0906\u0923\u093F \u091C\u094B\u0921\u093E...', lowpower:'\u0932\u094B-\u092A\u0949\u0935\u0930 \u092E\u094B\u0921', exportBtn:'\u092E\u093E\u091D\u093E \u0921\u0947\u091F\u093E \u0928\u093F\u0930\u094D\u092F\u093E\u0924 \u0915\u0930\u093E', deleteBtn:'\u092E\u093E\u091D\u093E \u0921\u0947\u091F\u093E \u0939\u091F\u0935\u093E', rights:'\u0938\u0930\u094D\u0935 \u0939\u0915\u094D\u0915 \u0930\u093E\u0916\u0940\u0935'},
+  gu:{title:'\u0A97\u0ACD\u0AB2\u0ACB\u0AAC\u0AB8', live:'\u0AB2\u0ABE\u0A88\u0AB5 \u00B7 \u0AB8\u0ABF\u0A82\u0A95 \u0A95\u0AB0\u0AC7\u0AB2\u0AC1\u0A82', pause:'\u0AA5\u0ACB\u0AAD\u0ABE\u0AB5\u0ACB', resume:'\u0AAB\u0AB0\u0AC0 \u0AB6\u0AB0\u0AC2 \u0A95\u0AB0\u0ACB', compare:'\u0AB6\u0AB9\u0AC7\u0AB0\u0ACB\u0AA8\u0AC0 \u0AB8\u0AB0\u0A96\u0ABE\u0AAE\u0AA3\u0AC0 \u0A95\u0AB0\u0ACB', hideCompare:'\u0AB8\u0AB0\u0A96\u0ABE\u0AAE\u0AA3\u0AC0 \u0A9B\u0AC1\u0AAA\u0ABE\u0AB5\u0ACB', edit:'\u0A89\u0AAE\u0AC7\u0AB0\u0ACB / \u0AA6\u0AC2\u0AB0 \u0A95\u0AB0\u0ACB / \u0AAB\u0AB0\u0AC0\u0AA5\u0AC0 \u0A97\u0ACB\u0AA0\u0AB5\u0ACB', done:'\u0AAA\u0AC2\u0AB0\u0ACD\u0AA3', home:'\u0A98\u0AB0 \u0AB6\u0AB9\u0AC7\u0AB0', search:'\u0AB6\u0AB9\u0AC7\u0AB0 \u0AB6\u0ACB\u0AA7\u0ACB \u0A85\u0AA8\u0AC7 \u0A89\u0AAE\u0AC7\u0AB0\u0ACB...', lowpower:'\u0AB2\u0ACB-\u0AAA\u0ABE\u0AB5\u0AB0 \u0AAE\u0ACB\u0AA1', exportBtn:'\u0AAE\u0ABE\u0AB0\u0ACB \u0AA1\u0AC7\u0A9F\u0ABE \u0AA8\u0ABF\u0A95\u0ABE\u0AB8 \u0A95\u0AB0\u0ACB', deleteBtn:'\u0AAE\u0ABE\u0AB0\u0ACB \u0AA1\u0AC7\u0A9F\u0ABE \u0A95\u0ABE\u0AA2\u0AC0 \u0AA8\u0ABE\u0A96\u0ACB', rights:'\u0AB8\u0AB0\u0ACD\u0AB5 \u0AB9\u0A95\u0ACD\u0A95 \u0A85\u0AA8\u0ABE\u0AAE\u0AA4'},
+  kn:{title:'\u0C97\u0CCD\u0CB2\u0CCB\u0CAC\u0CB8\u0CCD', live:'\u0CB2\u0CC8\u0CB5\u0CCD \u00B7 \u0CB8\u0CBF\u0C82\u0C95\u0CCD \u0C86\u0C97\u0CBF\u0CA6\u0CC6', pause:'\u0CB5\u0CBF\u0CB0\u0CBE\u0CAE', resume:'\u0CAE\u0CC1\u0C82\u0CA6\u0CC1\u0CB5\u0CB0\u0CBF\u0CB8\u0CBF', compare:'\u0CA8\u0C97\u0CB0\u0C97\u0CB3\u0CA8\u0CCD\u0CA8\u0CC1 \u0CB9\u0CCB\u0CB2\u0CBF\u0CB8\u0CBF', hideCompare:'\u0CB9\u0CCB\u0CB2\u0CBF\u0C95\u0CC6 \u0CAE\u0CB0\u0CC6\u0CAE\u0CBE\u0CA1\u0CBF', edit:'\u0CB8\u0CC7\u0CB0\u0CBF\u0CB8\u0CBF / \u0CA4\u0CC6\u0C97\u0CC6\u0CA6\u0CC1\u0CB9\u0CBE\u0C95\u0CBF / \u0CAE\u0CB0\u0CC1\u0C95\u0CCD\u0CB0\u0CAE\u0C97\u0CCA\u0CB3\u0CBF\u0CB8\u0CBF', done:'\u0CAE\u0CC1\u0C97\u0CBF\u0CA6\u0CBF\u0CA6\u0CC6', home:'\u0CAE\u0CA8\u0CC6 \u0CA8\u0C97\u0CB0', search:'\u0CA8\u0C97\u0CB0\u0CB5\u0CA8\u0CCD\u0CA8\u0CC1 \u0CB9\u0CC1\u0CA1\u0CC1\u0C95\u0CBF \u0CB8\u0CC7\u0CB0\u0CBF\u0CB8\u0CBF...', lowpower:'\u0C95\u0CA1\u0CBF\u0CAE\u0CC6-\u0CB6\u0C95\u0CCD\u0CA4\u0CBF \u0CAE\u0CCB\u0CA1\u0CCD', exportBtn:'\u0CA8\u0CA8\u0CCD\u0CA8 \u0CA1\u0CC7\u0C9F\u0CBE \u0CB0\u0CAB\u0CCD\u0CA4\u0CC1 \u0CAE\u0CBE\u0CA1\u0CBF', deleteBtn:'\u0CA8\u0CA8\u0CCD\u0CA8 \u0CA1\u0CC7\u0C9F\u0CBE \u0C85\u0CB3\u0CBF\u0CB8\u0CBF', rights:'\u0C8E\u0CB2\u0CCD\u0CB2\u0CBE \u0CB9\u0C95\u0CCD\u0C95\u0CC1\u0C97\u0CB3\u0CA8\u0CCD\u0CA8\u0CC1 \u0C95\u0CBE\u0CAF\u0CCD\u0CA6\u0CBF\u0CB0\u0CBF\u0CB8\u0CB2\u0CBE\u0C97\u0CBF\u0CA6\u0CC6'},
+  ml:{title:'\u0D17\u0D4D\u0D32\u0D4B\u0D2C\u0D38\u0D4D', live:'\u0D24\u0D24\u0D4D\u0D38\u0D2E\u0D2F\u0D02 \u00B7 \u0D38\u0D2E\u0D28\u0D4D\u0D35\u0D2F\u0D3F\u0D2A\u0D4D\u0D2A\u0D3F\u0D1A\u0D4D\u0D1A\u0D41', pause:'\u0D24\u0D3E\u0D7D\u0D15\u0D4D\u0D15\u0D3E\u0D32\u0D3F\u0D15\u0D2E\u0D3E\u0D2F\u0D3F \u0D28\u0D3F\u0D7C\u0D24\u0D4D\u0D24\u0D41\u0D15', resume:'\u0D24\u0D41\u0D1F\u0D30\u0D41\u0D15', compare:'\u0D28\u0D17\u0D30\u0D19\u0D4D\u0D19\u0D7E \u0D24\u0D3E\u0D30\u0D24\u0D2E\u0D4D\u0D2F\u0D02 \u0D1A\u0D46\u0D2F\u0D4D\u0D2F\u0D41\u0D15', hideCompare:'\u0D24\u0D3E\u0D30\u0D24\u0D2E\u0D4D\u0D2F\u0D02 \u0D2E\u0D31\u0D2F\u0D4D\u0D15\u0D4D\u0D15\u0D41\u0D15', edit:'\u0D1A\u0D47\u0D7C\u0D15\u0D4D\u0D15\u0D41\u0D15 / \u0D28\u0D40\u0D15\u0D4D\u0D15\u0D02 \u0D1A\u0D46\u0D2F\u0D4D\u0D2F\u0D41\u0D15 / \u0D15\u0D4D\u0D30\u0D2E\u0D02 \u0D2E\u0D3E\u0D31\u0D4D\u0D31\u0D41\u0D15', done:'\u0D2A\u0D42\u0D7C\u0D24\u0D4D\u0D24\u0D3F\u0D2F\u0D3E\u0D2F\u0D3F', home:'\u0D39\u0D4B\u0D02 \u0D28\u0D17\u0D30\u0D02', search:'\u0D28\u0D17\u0D30\u0D02 \u0D24\u0D3F\u0D30\u0D1E\u0D4D\u0D1E\u0D4D \u0D1A\u0D47\u0D7C\u0D15\u0D4D\u0D15\u0D41\u0D15...', lowpower:'\u0D32\u0D4B-\u0D2A\u0D35\u0D7C \u0D2E\u0D4B\u0D21\u0D4D', exportBtn:'\u0D0E\u0D28\u0D4D\u0D31\u0D46 \u0D21\u0D3E\u0D31\u0D4D\u0D31 \u0D0E\u0D15\u0D4D\u0D38\u0D4D\u0D2A\u0D4B\u0D7C\u0D1F\u0D4D\u0D1F\u0D4D \u0D1A\u0D46\u0D2F\u0D4D\u0D2F\u0D41\u0D15', deleteBtn:'\u0D0E\u0D28\u0D4D\u0D31\u0D46 \u0D21\u0D3E\u0D31\u0D4D\u0D31 \u0D07\u0D32\u0D4D\u0D32\u0D3E\u0D24\u0D3E\u0D15\u0D4D\u0D15\u0D41\u0D15', rights:'\u0D0E\u0D32\u0D4D\u0D32\u0D3E \u0D05\u0D35\u0D15\u0D3E\u0D36\u0D19\u0D4D\u0D19\u0D33\u0D41\u0D02 \u0D28\u0D3F\u0D15\u0D4D\u0D37\u0D3F\u0D2A\u0D4D\u0D24\u0D02'},
+  pa:{title:'\u0A17\u0A32\u0A4B\u0A2C\u0A38', live:'\u0A32\u0A3E\u0A08\u0A35 \u00B7 \u0A38\u0A3F\u0A70\u0A15 \u0A39\u0A4B\u0A07\u0A06', pause:'\u0A30\u0A4B\u0A15\u0A4B', resume:'\u0A2E\u0A41\u0A5C \u0A38\u0A3C\u0A41\u0A30\u0A42 \u0A15\u0A30\u0A4B', compare:'\u0A38\u0A3C\u0A39\u0A3F\u0A30\u0A3E\u0A02 \u0A26\u0A40 \u0A24\u0A41\u0A32\u0A28\u0A3E \u0A15\u0A30\u0A4B', hideCompare:'\u0A24\u0A41\u0A32\u0A28\u0A3E \u0A32\u0A41\u0A15\u0A3E\u0A13', edit:'\u0A1C\u0A4B\u0A5C\u0A4B / \u0A39\u0A1F\u0A3E\u0A13 / \u0A2E\u0A41\u0A5C \u0A15\u0A4D\u0A30\u0A2E \u0A26\u0A3F\u0A13', done:'\u0A39\u0A4B \u0A17\u0A3F\u0A06', home:'\u0A18\u0A30 \u0A38\u0A3C\u0A39\u0A3F\u0A30', search:'\u0A38\u0A3C\u0A39\u0A3F\u0A30 \u0A32\u0A71\u0A2D\u0A4B \u0A05\u0A24\u0A47 \u0A1C\u0A4B\u0A5C\u0A4B...', lowpower:'\u0A18\u0A71\u0A1F-\u0A2A\u0A3E\u0A35\u0A30 \u0A2E\u0A4B\u0A21', exportBtn:'\u0A2E\u0A47\u0A30\u0A3E \u0A21\u0A3E\u0A1F\u0A3E \u0A10\u0A15\u0A38\u0A2A\u0A4B\u0A30\u0A1F \u0A15\u0A30\u0A4B', deleteBtn:'\u0A2E\u0A47\u0A30\u0A3E \u0A21\u0A3E\u0A1F\u0A3E \u0A2E\u0A3F\u0A1F\u0A3E\u0A13', rights:'\u0A38\u0A3E\u0A30\u0A47 \u0A39\u0A71\u0A15 \u0A30\u0A3E\u0A16\u0A35\u0A47\u0A02 \u0A39\u0A28'},
+  ur:{title:'\u06AF\u0644\u0648\u0628\u0633', live:'\u0644\u0627\u0626\u06CC\u0648 \u00B7 \u06C1\u0645 \u0622\u06C1\u0646\u06AF', pause:'\u0631\u0648\u06A9\u06CC\u06BA', resume:'\u062F\u0648\u0628\u0627\u0631\u06C1 \u0634\u0631\u0648\u0639 \u06A9\u0631\u06CC\u06BA', compare:'\u0634\u06C1\u0631\u0648\u06BA \u06A9\u0627 \u0645\u0648\u0627\u0632\u0646\u06C1 \u06A9\u0631\u06CC\u06BA', hideCompare:'\u0645\u0648\u0627\u0632\u0646\u06C1 \u0686\u06BE\u067E\u0627\u0626\u06CC\u06BA', edit:'\u0634\u0627\u0645\u0644 \u06A9\u0631\u06CC\u06BA / \u06C1\u0679\u0627\u0626\u06CC\u06BA / \u062A\u0631\u062A\u06CC\u0628 \u0628\u062F\u0644\u06CC\u06BA', done:'\u0645\u06A9\u0645\u0644', home:'\u06AF\u06BE\u0631 \u06A9\u0627 \u0634\u06C1\u0631', search:'\u0634\u06C1\u0631 \u062A\u0644\u0627\u0634 \u06A9\u0631 \u06A9\u06D2 \u0634\u0627\u0645\u0644 \u06A9\u0631\u06CC\u06BA...', lowpower:'\u06A9\u0645 \u0628\u062C\u0644\u06CC \u0645\u0648\u0688', exportBtn:'\u0645\u06CC\u0631\u0627 \u0688\u06CC\u0679\u0627 \u0628\u0631\u0622\u0645\u062F \u06A9\u0631\u06CC\u06BA', deleteBtn:'\u0645\u06CC\u0631\u0627 \u0688\u06CC\u0679\u0627 \u062D\u0630\u0641 \u06A9\u0631\u06CC\u06BA', rights:'\u062C\u0645\u0644\u06C1 \u062D\u0642\u0648\u0642 \u0645\u062D\u0641\u0648\u0638 \u06C1\u06CC\u06BA'},
+  or:{title:'\u0B17\u0B4D\u0B32\u0B4B\u0B2C\u0B38', live:'\u0B32\u0B3E\u0B07\u0B2D\u0B4D \u00B7 \u0B38\u0B3F\u0B19\u0B4D\u0B15\u0B4D \u0B39\u0B4B\u0B07\u0B1B\u0B3F', pause:'\u0B2C\u0B3F\u0B30\u0B24\u0B3F', resume:'\u0B2A\u0B41\u0B28\u0B03 \u0B06\u0B30\u0B2E\u0B4D\u0B2D', compare:'\u0B38\u0B39\u0B30\u0B17\u0B41\u0B21\u0B3C\u0B3F\u0B15\u0B41 \u0B24\u0B41\u0B33\u0B28\u0B3E \u0B15\u0B30\u0B28\u0B4D\u0B24\u0B41', hideCompare:'\u0B24\u0B41\u0B33\u0B28\u0B3E \u0B32\u0B41\u0B15\u0B3E\u0B28\u0B4D\u0B24\u0B41', edit:'\u0B2F\u0B4B\u0B21\u0B28\u0B4D\u0B24\u0B41 / \u0B39\u0B1F\u0B3E\u0B28\u0B4D\u0B24\u0B41 / \u0B15\u0B4D\u0B30\u0B2E \u0B2C\u0B26\u0B33\u0B3E\u0B28\u0B4D\u0B24\u0B41', done:'\u0B38\u0B2E\u0B3E\u0B2A\u0B4D\u0B24', home:'\u0B18\u0B30 \u0B38\u0B39\u0B30', search:'\u0B38\u0B39\u0B30 \u0B16\u0B4B\u0B1C\u0B3F \u0B2F\u0B4B\u0B21\u0B28\u0B4D\u0B24\u0B41...', lowpower:'\u0B32\u0B4B-\u0B2A\u0B3E\u0B71\u0B3E\u0B30 \u0B2E\u0B4B\u0B21\u0B4D', exportBtn:'\u0B2E\u0B4B \u0B24\u0B25\u0B4D\u0B5F \u0B30\u0B2A\u0B4D\u0B24\u0B3E\u0B28\u0B3F \u0B15\u0B30\u0B28\u0B4D\u0B24\u0B41', deleteBtn:'\u0B2E\u0B4B \u0B24\u0B25\u0B4D\u0B5F \u0B2C\u0B3F\u0B32\u0B4B\u0B2A \u0B15\u0B30\u0B28\u0B4D\u0B24\u0B41', rights:'\u0B38\u0B2E\u0B38\u0B4D\u0B24 \u0B05\u0B27\u0B3F\u0B15\u0B3E\u0B30 \u0B38\u0B02\u0B30\u0B15\u0B4D\u0B37\u0B3F\u0B24'},
+  de:{title:'Globus', live:'Live \u00B7 synchronisiert', pause:'Pause', resume:'Fortsetzen', compare:'St\u00E4dte vergleichen', hideCompare:'Vergleich ausblenden', edit:'Hinzuf\u00FCgen / Entfernen / Neu ordnen', done:'Fertig', home:'Heimatstadt', search:'Stadt suchen und hinzuf\u00FCgen...', lowpower:'Energiesparmodus', exportBtn:'Meine Daten exportieren', deleteBtn:'Meine Daten l\u00F6schen', rights:'Alle Rechte vorbehalten'},
+  pt:{title:'Globus', live:'Ao vivo \u00B7 sincronizado', pause:'Pausar', resume:'Retomar', compare:'Comparar cidades', hideCompare:'Ocultar compara\u00E7\u00E3o', edit:'Adicionar / remover / reordenar', done:'Conclu\u00EDdo', home:'Cidade base', search:'Pesquisar e adicionar uma cidade...', lowpower:'Modo de economia de energia', exportBtn:'Exportar meus dados', deleteBtn:'Excluir meus dados', rights:'Todos os direitos reservados'},
+  ru:{title:'\u0413\u043B\u043E\u0431\u0443\u0441', live:'\u0412 \u0440\u0435\u0430\u043B\u044C\u043D\u043E\u043C \u0432\u0440\u0435\u043C\u0435\u043D\u0438 \u00B7 \u0441\u0438\u043D\u0445\u0440\u043E\u043D\u0438\u0437\u0438\u0440\u043E\u0432\u0430\u043D\u043E', pause:'\u041F\u0430\u0443\u0437\u0430', resume:'\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u044C', compare:'\u0421\u0440\u0430\u0432\u043D\u0438\u0442\u044C \u0433\u043E\u0440\u043E\u0434\u0430', hideCompare:'\u0421\u043A\u0440\u044B\u0442\u044C \u0441\u0440\u0430\u0432\u043D\u0435\u043D\u0438\u0435', edit:'\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C / \u0443\u0434\u0430\u043B\u0438\u0442\u044C / \u0438\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043F\u043E\u0440\u044F\u0434\u043E\u043A', done:'\u0413\u043E\u0442\u043E\u0432\u043E', home:'\u0414\u043E\u043C\u0430\u0448\u043D\u0438\u0439 \u0433\u043E\u0440\u043E\u0434', search:'\u041D\u0430\u0439\u0442\u0438 \u0438 \u0434\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0433\u043E\u0440\u043E\u0434...', lowpower:'\u0420\u0435\u0436\u0438\u043C \u044D\u043D\u0435\u0440\u0433\u043E\u0441\u0431\u0435\u0440\u0435\u0436\u0435\u043D\u0438\u044F', exportBtn:'\u042D\u043A\u0441\u043F\u043E\u0440\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u043C\u043E\u0438 \u0434\u0430\u043D\u043D\u044B\u0435', deleteBtn:'\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043C\u043E\u0438 \u0434\u0430\u043D\u043D\u044B\u0435', rights:'\u0412\u0441\u0435 \u043F\u0440\u0430\u0432\u0430 \u0437\u0430\u0449\u0438\u0449\u0435\u043D\u044B'},
+  zh:{title:'\u683C\u6D1B\u5DF4\u65AF', live:'\u5B9E\u65F6 \u00B7 \u5DF2\u540C\u6B65', pause:'\u6682\u505C', resume:'\u7EE7\u7EED', compare:'\u6BD4\u8F83\u57CE\u5E02', hideCompare:'\u9690\u85CF\u6BD4\u8F83', edit:'\u6DFB\u52A0 / \u5220\u9664 / \u91CD\u65B0\u6392\u5E8F', done:'\u5B8C\u6210', home:'\u5E38\u9A7B\u57CE\u5E02', search:'\u641C\u7D22\u5E76\u6DFB\u52A0\u57CE\u5E02...', lowpower:'\u7701\u7535\u6A21\u5F0F', exportBtn:'\u5BFC\u51FA\u6211\u7684\u6570\u636E', deleteBtn:'\u5220\u9664\u6211\u7684\u6570\u636E', rights:'\u7248\u6743\u6240\u6709'},
+  ja:{title:'\u30B0\u30ED\u30D6\u30B9', live:'\u30E9\u30A4\u30D6 \u00B7 \u540C\u671F\u6E08\u307F', pause:'\u4E00\u6642\u505C\u6B62', resume:'\u518D\u958B', compare:'\u90FD\u5E02\u3092\u6BD4\u8F03', hideCompare:'\u6BD4\u8F03\u3092\u96A0\u3059', edit:'\u8FFD\u52A0 / \u524A\u9664 / \u4E26\u3079\u66FF\u3048', done:'\u5B8C\u4E86', home:'\u30DB\u30FC\u30E0\u30BF\u30A6\u30F3', search:'\u90FD\u5E02\u3092\u691C\u7D22\u3057\u3066\u8FFD\u52A0...', lowpower:'\u4F4E\u96FB\u529B\u30E2\u30FC\u30C9', exportBtn:'\u30C7\u30FC\u30BF\u3092\u30A8\u30AF\u30B9\u30DD\u30FC\u30C8', deleteBtn:'\u30C7\u30FC\u30BF\u3092\u524A\u9664', rights:'\u5168\u8457\u4F5C\u6A29\u6240\u6709'},
+  ar:{title:'\u063A\u0644\u0648\u0628\u0648\u0633', live:'\u0645\u0628\u0627\u0634\u0631 \u00B7 \u0645\u062A\u0632\u0627\u0645\u0646', pause:'\u0625\u064A\u0642\u0627\u0641 \u0645\u0624\u0642\u062A', resume:'\u0627\u0633\u062A\u0626\u0646\u0627\u0641', compare:'\u0645\u0642\u0627\u0631\u0646\u0629 \u0627\u0644\u0645\u062F\u0646', hideCompare:'\u0625\u062E\u0641\u0627\u0621 \u0627\u0644\u0645\u0642\u0627\u0631\u0646\u0629', edit:'\u0625\u0636\u0627\u0641\u0629 / \u0625\u0632\u0627\u0644\u0629 / \u0625\u0639\u0627\u062F\u0629 \u062A\u0631\u062A\u064A\u0628', done:'\u062A\u0645', home:'\u0627\u0644\u0645\u062F\u064A\u0646\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629', search:'\u0627\u0644\u0628\u062D\u062B \u0639\u0646 \u0645\u062F\u064A\u0646\u0629 \u0648\u0625\u0636\u0627\u0641\u062A\u0647\u0627...', lowpower:'\u0648\u0636\u0639 \u062A\u0648\u0641\u064A\u0631 \u0627\u0644\u0637\u0627\u0642\u0629', exportBtn:'\u062A\u0635\u062F\u064A\u0631 \u0628\u064A\u0627\u0646\u0627\u062A\u064A', deleteBtn:'\u062D\u0630\u0641 \u0628\u064A\u0627\u0646\u0627\u062A\u064A', rights:'\u062C\u0645\u064A\u0639 \u0627\u0644\u062D\u0642\u0648\u0642 \u0645\u062D\u0641\u0648\u0638\u0629'},
+  ko:{title:'\uAE00\uB85C\uBC84\uC2A4', live:'\uC2E4\uC2DC\uAC04 \u00B7 \uB3D9\uAE30\uD654\uB428', pause:'\uC77C\uC2DC\uC815\uC9C0', resume:'\uC7AC\uAC1C', compare:'\uB3C4\uC2DC \uBE44\uAD50', hideCompare:'\uBE44\uAD50 \uC228\uAE30\uAE30', edit:'\uCD94\uAC00 / \uC0AD\uC81C / \uC21C\uC11C \uBCC0\uACBD', done:'\uC644\uB8CC', home:'\uD648 \uB3C4\uC2DC', search:'\uB3C4\uC2DC \uAC80\uC0C9 \uD6C4 \uCD94\uAC00...', lowpower:'\uC800\uC804\uB825 \uBAA8\uB4DC', exportBtn:'\uB0B4 \uB370\uC774\uD130 \uB0B4\uBCF4\uB0B4\uAE30', deleteBtn:'\uB0B4 \uB370\uC774\uD130 \uC0AD\uC81C', rights:'\uBAA8\uB4E0 \uAD8C\uB9AC \uBCF4\uC720'},
+  it:{title:'Globus', live:'Live \u00B7 sincronizzato', pause:'Pausa', resume:'Riprendi', compare:'Confronta citt\u00E0', hideCompare:'Nascondi confronto', edit:'Aggiungi / rimuovi / riordina', done:'Fatto', home:'Citt\u00E0 di base', search:'Cerca e aggiungi una citt\u00E0...', lowpower:'Modalit\u00E0 risparmio energetico', exportBtn:'Esporta i miei dati', deleteBtn:'Elimina i miei dati', rights:'Tutti i diritti riservati'},
+};
+
+// Curated translations for well-known cities only (falls back to the original
+// name otherwise, rather than guessing at unfamiliar localized city names).
+const CITY_NAME_I18N = {
+  'New York': {es:'Nueva York', hi:'\u0928\u094D\u092F\u0942\u092F\u0949\u0930\u094D\u0915', bn:'\u09A8\u09BF\u0989 \u0987\u09AF\u09BC\u09B0\u09CD\u0995'},
+  'Los Angeles': {es:'Los \u00C1ngeles'},
+  'Mexico City': {es:'Ciudad de M\u00E9xico'},
+  'Rio de Janeiro': {es:'R\u00EDo de Janeiro'},
+  'London': {es:'Londres', fr:'Londres', hi:'\u0932\u0902\u0926\u0928', bn:'\u09B2\u09A8\u09CD\u09A1\u09A8'},
+  'Paris': {es:'Par\u00EDs', hi:'\u092A\u0947\u0930\u093F\u0938', bn:'\u09AA\u09CD\u09AF\u09BE\u09B0\u09BF\u09B8'},
+  'Berlin': {es:'Berl\u00EDn', hi:'\u092C\u0930\u094D\u0932\u093F\u0928'},
+  'Rome': {es:'Roma', hi:'\u0930\u094B\u092E'},
+  'Athens': {es:'Atenas', fr:'Ath\u00E8nes'},
+  'Vienna': {es:'Viena', fr:'Vienne'},
+  'Moscow': {es:'Mosc\u00FA', fr:'Moscou', hi:'\u092E\u0949\u0938\u094D\u0915\u094B', bn:'\u09AE\u09B8\u09CD\u0995\u09CB'},
+  'Cairo': {es:'El Cairo', fr:'Le Caire', hi:'\u0915\u093E\u0939\u093F\u0930\u093E', bn:'\u0995\u09BE\u09AF\u09BC\u09B0\u09CB'},
+  'Prague': {es:'Praga'},
+  'Warsaw': {es:'Varsovia', fr:'Varsovie'},
+  'Copenhagen': {es:'Copenhague', fr:'Copenhague'},
+  'Lisbon': {es:'Lisboa', fr:'Lisbonne'},
+  'Dublin': {es:'Dubl\u00EDn'},
+  'Brussels': {es:'Bruselas', fr:'Bruxelles'},
+  'Zurich': {es:'Z\u00FArich'},
+  'Stockholm': {es:'Estocolmo'},
+  'Beijing': {es:'Pek\u00EDn', fr:'P\u00E9kin', hi:'\u092C\u0940\u091C\u093F\u0902\u0917', bn:'\u09AC\u09C7\u0987\u099C\u09BF\u0982'},
+  'Tokyo': {es:'Tokio', hi:'\u091F\u094B\u0915\u094D\u092F\u094B', bn:'\u099F\u09CB\u0995\u09BF\u0993'},
+  'Seoul': {es:'Se\u00FAl', fr:'S\u00E9oul'},
+  'Singapore': {es:'Singapur', fr:'Singapour', hi:'\u0938\u093F\u0902\u0917\u093E\u092A\u0941\u0930', bn:'\u09B8\u09BF\u0999\u09CD\u0997\u09BE\u09AA\u09C1\u09B0'},
+  'Shanghai': {es:'Shangh\u00E1i'},
+  'Sydney': {es:'S\u00EDdney', hi:'\u0938\u093F\u0921\u0928\u0940', bn:'\u09B8\u09BF\u09A1\u09A8\u09BF'},
+  'Dubai': {hi:'\u0926\u0941\u092C\u0908', bn:'\u09A6\u09C1\u09AC\u09BE\u0987'},
+  'Mumbai': {hi:'\u092E\u0941\u0902\u092C\u0908', bn:'\u09AE\u09C1\u09AE\u09CD\u09AC\u0987'},
+  'Delhi': {hi:'\u0926\u093F\u0932\u094D\u0932\u0940', bn:'\u09A6\u09BF\u09B2\u09CD\u09B2\u09BF'},
+  'Kolkata': {hi:'\u0915\u094B\u0932\u0915\u093E\u0924\u093E', bn:'\u0995\u09B2\u0995\u09BE\u09A4\u09BE'},
+  'Bengaluru': {hi:'\u092C\u0947\u0902\u0917\u0932\u0941\u0930\u0941', bn:'\u09AC\u09C7\u0999\u09CD\u0997\u09BE\u09B2\u09C1\u09B0\u09C1'},
+  'Chennai': {hi:'\u091A\u0947\u0928\u094D\u0928\u0908', bn:'\u099A\u09C7\u09A8\u09CD\u09A8\u0987'},
+  'Dhaka': {hi:'\u0922\u093E\u0915\u093E', bn:'\u09A2\u09BE\u0995\u09BE'},
+  'Karachi': {hi:'\u0915\u0930\u093E\u091A\u0940', bn:'\u0995\u09B0\u09BE\u099A\u09BF'},
+  'Bangkok': {hi:'\u092C\u0948\u0902\u0915\u0949\u0915', bn:'\u09AC\u09CD\u09AF\u09BE\u0982\u0995\u0995'},
+  'Hong Kong': {hi:'\u0939\u0949\u0928\u094D\u0917 \u0915\u0949\u0902\u0917', bn:'\u09B9\u0982\u0995\u0982'}
+};
+function cityName(c){
+  const tr = CITY_NAME_I18N[c.city];
+  return (tr && tr[uiLang]) || c.city;
+}
+let analogSet = new Set();
+let dragId = null;
+const deviceZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+let homeCityId = (CITIES.find(c => c.zone === deviceZone) || CITIES.find(c => c.city === 'Kolkata')).id;
+
+const app = document.querySelector('.app');
+const grid = document.getElementById('grid');
+const citySearch = document.getElementById('citySearch');
+const acList = document.getElementById('acList');
+const editToggle = document.getElementById('editToggle');
+const editLabel = document.getElementById('editLabel');
+const compareToggle = document.getElementById('compareToggle');
+const compareLabel = document.getElementById('compareLabel');
+const pauseToggle = document.getElementById('pauseToggle');
+const pauseIcon = document.getElementById('pauseIcon');
+const pauseLabel = document.getElementById('pauseLabel');
+const cmpA = document.getElementById('cmpA');
+const cmpB = document.getElementById('cmpB');
+const cmpResult = document.getElementById('cmpResult');
+const cmpOverlap = document.getElementById('cmpOverlap');
+const cmpJetlag = document.getElementById('cmpJetlag');
+const moonBar = document.getElementById('moonBar');
+const homeSelect = document.getElementById('homeSelect');
+const langSelect = document.getElementById('langSelect');
+const fontSizeInput = document.getElementById('fontSize');
+const lowPowerToggle = document.getElementById('lowPowerToggle');
+const lowPowerLabel = document.getElementById('lowPowerLabel');
+const exportBtn = document.getElementById('exportBtn');
+const deleteBtn = document.getElementById('deleteBtn');
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// Sync clock with a free, keyless time API; fall back to device time if unreachable.
+fetch('https://worldtimeapi.org/api/timezone/Etc/UTC')
+  .then(r => r.json())
+  .then(data => { serverOffsetMs = new Date(data.utc_datetime).getTime() - Date.now(); })
+  .catch(() => { serverOffsetMs = 0; });
+
+function now(){ return new Date(Date.now() + serverOffsetMs); }
+function fmt(zone, opts){ return new Intl.DateTimeFormat(LOCALES[uiLang] || 'en-GB', {timeZone:zone, ...opts}); }
+function fmtDisplay(zone, opts){ return new Intl.DateTimeFormat(DISPLAY_LOCALES[uiLang] || 'en-GB', {timeZone:zone, ...opts}); }
+
+function offsetMinutes(zone, date){
+  const parts = new Intl.DateTimeFormat('en-US', {timeZone:zone, timeZoneName:'longOffset'}).formatToParts(date);
+  const raw = (parts.find(p => p.type === 'timeZoneName') || {}).value || 'GMT';
+  const m = raw.match(/GMT([+-])(\d{2}):(\d{2})/);
+  if(!m) return 0;
+  return (m[1] === '-' ? -1 : 1) * (parseInt(m[2],10) * 60 + parseInt(m[3],10));
+}
+
+function haversineKm(lat1,lon1,lat2,lon2){
+  const R = 6371, toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2-lat1), dLon = toRad(lon2-lon1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+function flightEstimate(km){
+  const hrs = km/850 + 0.75;
+  const h = Math.floor(hrs), m = Math.round((hrs-h)*60);
+  return `${h}h ${m}m`;
+}
+
+function band(hour){
+  if(hour < 5 || hour >= 22) return {name:'Night', color:'#5b4b9e', day:false};
+  if(hour < 11) return {name:'Morning', color:'#e0a640', day:true};
+  if(hour < 17) return {name:'Afternoon', color:'#4f8fe0', day:true};
+  return {name:'Evening', color:'#e0673f', day:true};
+}
+
+function workWindowUTC(zone, date){
+  const parts = fmt(zone, {year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date);
+  const y = +parts.find(p=>p.type==='year').value, mo = +parts.find(p=>p.type==='month').value, d = +parts.find(p=>p.type==='day').value;
+  const off = offsetMinutes(zone, date);
+  const base = Date.UTC(y, mo-1, d, 0, 0, 0);
+  return [base + (9*60 - off)*60000, base + (17*60 - off)*60000];
+}
+function overlapText(cityA, cityB, date){
+  const [aS,aE] = workWindowUTC(cityA.zone, date);
+  const [bS,bE] = workWindowUTC(cityB.zone, date);
+  const s = Math.max(aS,bS), e = Math.min(aE,bE);
+  if(e <= s) return 'No overlap in standard 9AM\u20135PM hours today';
+  const tA = fmt(cityA.zone, {hour:'2-digit',minute:'2-digit',hour12:use12h});
+  const tB = fmt(cityB.zone, {hour:'2-digit',minute:'2-digit',hour12:use12h});
+  return `Overlap (9\u20135 hrs): ${tA.format(new Date(s))}\u2013${tA.format(new Date(e))} in ${cityName(cityA)} = ${tB.format(new Date(s))}\u2013${tB.format(new Date(e))} in ${cityName(cityB)}`;
+}
+
+// Rough rule-of-thumb jetlag guidance: ~1 recovery day per 1.5h of zone change,
+// with opposite light/sleep-shift advice depending on travel direction.
+function jetlagTips(origin, dest, date){
+  const diff = (offsetMinutes(dest.zone,date) - offsetMinutes(origin.zone,date)) / 60;
+  if(Math.abs(diff) < 1) return `${cityName(origin)} \u2192 ${cityName(dest)}: minimal jetlag expected (under 1h difference).`;
+  const days = Math.max(1, Math.round(Math.abs(diff) / 1.5));
+  const eastward = diff > 0;
+  const advice = eastward
+    ? 'shift bedtime earlier and seek bright morning light at your destination'
+    : 'shift bedtime later and seek bright evening light at your destination';
+  return `${cityName(origin)} \u2192 ${cityName(dest)}: ~${Math.abs(diff).toFixed(1)}h ${eastward?'ahead':'behind'}. Allow ~${days} day(s) to adjust \u2014 ${advice}, avoid opposite-timed light.`;
+}
+
+// Moon phase from a known reference new moon, via the synodic month length (approximation, no API needed).
+function moonPhase(date){
+  const synodic = 29.530588853;
+  const refNewMoon = Date.UTC(2000,0,6,18,14,0);
+  const days = (date.getTime() - refNewMoon) / 86400000;
+  let frac = (days % synodic) / synodic;
+  if(frac < 0) frac += 1;
+  const illum = Math.round((1 - Math.cos(2*Math.PI*frac)) / 2 * 100);
+  const names = ['New Moon','Waxing Crescent','First Quarter','Waxing Gibbous','Full Moon','Waning Gibbous','Last Quarter','Waning Crescent'];
+  const emojis = ['\u{1F311}','\u{1F312}','\u{1F313}','\u{1F314}','\u{1F315}','\u{1F316}','\u{1F317}','\u{1F318}'];
+  const idx = Math.floor(frac * 8) % 8;
+  return {name: names[idx], emoji: emojis[idx], illum};
+}
+
+// Approximate tide state: an idealized semi-diurnal (M2, ~12.42h) cycle, phase-shifted by longitude.
+// This is a simplified simulation for flavor, NOT real tide-station data.
+function tideState(city, date){
+  const period = 12.42;
+  const hours = date.getTime()/3600000 + city.lng/15;
+  const pos = (hours % period) / period;
+  const y = Math.sin(2*Math.PI*pos);
+  const dy = Math.cos(2*Math.PI*pos);
+  let label;
+  if(y > 0.85) label = 'High';
+  else if(y < -0.85) label = 'Low';
+  else label = dy > 0 ? 'Rising' : 'Falling';
+  return `\u{1F30A} ${label} tide (approx.)`;
+}
+
+function timeHTML(zone, t){
+  const opts = {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:use12h};
+  if(!lowPower) opts.fractionalSecondDigits = 3;
+  const parts = fmtDisplay(zone, opts).formatToParts(t);
+  let html = '';
+  parts.forEach((p, i) => {
+    if(p.type === 'hour' || p.type === 'minute' || p.type === 'second'){ html += `<span class="d2">${p.value}</span>`; }
+    else if(p.type === 'fractionalSecond'){ if(!lowPower) html += `${p.value}</span>`; }
+    else if(p.type === 'literal' && parts[i+1] && parts[i+1].type === 'fractionalSecond'){ if(!lowPower) html += `<span class="ms">${p.value}`; }
+    else if(p.type === 'dayPeriod'){ html += `<span class="ampm">${p.value.toUpperCase()}</span>`; }
+    else { html += p.value; }
+  });
+  return html;
+}
+
+function distanceHTML(c){
+  if(c.id === homeCityId) return '&#127968; Home base';
+  const home = CITIES[homeCityId];
+  const km = Math.round(haversineKm(home.lat, home.lng, c.lat, c.lng));
+  return `${km.toLocaleString()} km &middot; ~${flightEstimate(km)} flight`;
+}
+
+function cardHTML(c){
+  const isAnalog = analogSet.has(c.id);
+  const isCoastal = COASTAL.has(c.city);
+  return `<div class="card ${isAnalog?'analog':''}" data-zone="${c.zone}" data-id="${c.id}" draggable="${editMode}">
+    <button class="remove" aria-label="Remove ${cityName(c)}" data-remove="${c.id}">&times;</button>
+    <button class="analog-toggle" aria-pressed="${isAnalog}" title="Toggle analog view" data-analog="${c.id}">&#128336;</button>
+    <button class="ambient-toggle" aria-pressed="false" title="Play ambient weather sound" data-ambient="${c.id}">&#128266;</button>
+    <div class="place"><span class="flag">${c.flag}</span><span class="city">${cityName(c)}</span><span class="country">${c.country}</span></div>
+    <div class="holiday" data-holiday hidden></div>
+    <div class="time" data-time>--:--:--.---</div>
+    <div class="analog-face" data-face>
+      <div class="hand hour" data-hh></div>
+      <div class="hand minute" data-mm></div>
+      <div class="hand second" data-ss></div>
+      <div class="center"></div>
+    </div>
+    <div class="sub"><span data-date>--</span><span class="badge" data-offset>UTC</span></div>
+    <div class="distance">${distanceHTML(c)}</div>
+    ${isCoastal ? '<div class="tide" data-tide>&#127754; --</div>' : ''}
+    <div class="daybar"><div class="dot" data-dot style="left:50%"></div></div>
+    <div class="daynight"><span data-icon>&#9728;</span><span data-label>Day</span></div>
+  </div>`;
+}
+
+function renderGrid(){
+  grid.innerHTML = active.map(cardHTML).join('');
+  if(typeof currentAmbientId !== 'undefined' && currentAmbientId !== null){
+    const btn = grid.querySelector(`[data-ambient="${currentAmbientId}"]`);
+    if(btn) btn.setAttribute('aria-pressed','true');
+  }
+  updateHolidays();
+}
+
+// Free, keyless public-holiday lookup (Nager.Date). Coverage varies by country;
+// cities without data simply show no banner.
+const holidayCache = new Map();
+async function fetchHolidays(cc){
+  const year = new Date().getFullYear();
+  const key = cc + year;
+  if(holidayCache.has(key)) return holidayCache.get(key);
+  const p = fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/${cc}`)
+    .then(r => r.ok ? r.json() : [])
+    .catch(() => []);
+  holidayCache.set(key, p);
+  return p;
+}
+async function updateHolidays(){
+  const t = now();
+  for(const c of active){
+    const card = grid.querySelector(`.card[data-id="${c.id}"]`);
+    const el = card && card.querySelector('[data-holiday]');
+    if(!el) continue;
+    const holidays = await fetchHolidays(c.cc);
+    const parts = fmt(c.zone, {year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(t);
+    const todayStr = `${parts.find(p=>p.type==='year').value}-${parts.find(p=>p.type==='month').value}-${parts.find(p=>p.type==='day').value}`;
+    const match = (holidays || []).find(h => h.date === todayStr);
+    if(match){ el.textContent = `\u{1F389} ${match.localName || match.name}`; el.hidden = false; }
+    else { el.hidden = true; }
+  }
+}
+
+function optionsByRegion(filterFn){
+  const regions = [...new Set(CITIES.map(c => c.region))];
+  return regions.map(r => {
+    const items = CITIES.filter(c => c.region === r && (!filterFn || filterFn(c)));
+    if(!items.length) return '';
+    return `<optgroup label="${r}">${items.map(c => `<option value="${c.id}">${c.flag} ${cityName(c)}, ${c.country}</option>`).join('')}</optgroup>`;
+  }).join('');
+}
+
+function renderSuggestions(){
+  const q = citySearch.value.trim().toLowerCase();
+  const avail = CITIES.filter(c => !active.some(a => a.id === c.id));
+  const matches = q ? avail.filter(c => c.city.toLowerCase().includes(q) || cityName(c).toLowerCase().includes(q) || c.country.toLowerCase().includes(q)).slice(0,8) : [];
+  acList.innerHTML = matches.map(c => `<div class="ac-item" data-id="${c.id}"><span>${c.flag}</span><span>${cityName(c)}</span><span class="muted">${c.country}</span></div>`).join('');
+  acList.classList.toggle('show', matches.length > 0);
+}
+citySearch.addEventListener('input', renderSuggestions);
+citySearch.addEventListener('focus', renderSuggestions);
+document.addEventListener('click', e => { if(!e.target.closest('.autocomplete')) acList.classList.remove('show'); });
+acList.addEventListener('click', e => {
+  const item = e.target.closest('.ac-item'); if(!item) return;
+  const city = CITIES[+item.dataset.id];
+  if(city){ active.push(city); renderGrid(); tick(); saveState(); }
+  citySearch.value = ''; acList.classList.remove('show');
+});
+
+function populateCompare(){
+  const prevA = cmpA.value, prevB = cmpB.value;
+  const opts = optionsByRegion();
+  cmpA.innerHTML = opts; cmpB.innerHTML = opts;
+  cmpA.value = prevA || CITIES.find(c => c.city === 'Kolkata').id;
+  cmpB.value = prevB || CITIES.find(c => c.city === 'London').id;
+}
+function updateCompare(){
+  if(!compareMode) return;
+  const t = now();
+  const cityA = CITIES[+cmpA.value], cityB = CITIES[+cmpB.value];
+  if(!cityA || !cityB) return;
+  const diff = offsetMinutes(cityA.zone,t) - offsetMinutes(cityB.zone,t);
+  const abs = Math.abs(diff), h = Math.floor(abs/60), m = abs%60;
+  const span = h ? `${h}h${m ? ' '+m+'m' : ''}` : `${m}m`;
+  cmpResult.innerHTML = diff === 0
+    ? `<strong>${cityName(cityA)}</strong> and <strong>${cityName(cityB)}</strong> are at the same time`
+    : (() => { const [ahead,behind] = diff>0 ? [cityA,cityB] : [cityB,cityA]; return `<strong>${cityName(ahead)}</strong> is <strong>${span}</strong> ahead of <strong>${cityName(behind)}</strong>`; })();
+  cmpOverlap.textContent = overlapText(cityA, cityB, t);
+  cmpJetlag.textContent = jetlagTips(cityA, cityB, t);
+}
+cmpA.addEventListener('change', updateCompare);
+cmpB.addEventListener('change', updateCompare);
+
+function populateHome(){
+  homeSelect.innerHTML = optionsByRegion();
+  homeSelect.value = homeCityId;
+}
+homeSelect.addEventListener('change', () => { homeCityId = +homeSelect.value; renderGrid(); tick(); saveState(); });
+
+function tick(){
+  if(!running) return;
+  const t = now();
+  document.querySelectorAll('.card').forEach(card => {
+    const zone = card.dataset.zone;
+    const dateStr = fmtDisplay(zone, {weekday:'short',day:'2-digit',month:'short'}).format(t);
+    let hour = parseInt(fmt(zone, {hour:'2-digit',hour12:false}).format(t), 10);
+    let minute = parseInt(fmt(zone, {minute:'2-digit'}).format(t), 10);
+    let second = parseInt(fmt(zone, {second:'2-digit'}).format(t), 10);
+    if(isNaN(hour) || isNaN(minute) || isNaN(second)){
+      // Locale-independent fallback if a formatter ever returns non-Latin digits
+      const en = new Intl.DateTimeFormat('en-US', {timeZone:zone, hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false, numberingSystem:'latn'}).formatToParts(t);
+      hour = +en.find(p=>p.type==='hour').value; minute = +en.find(p=>p.type==='minute').value; second = +en.find(p=>p.type==='second').value;
+    }
+    const offParts = fmt(zone, {hour:'2-digit',timeZoneName:'shortOffset'}).formatToParts(t);
+    const off = (offParts.find(p => p.type === 'timeZoneName') || {}).value || 'UTC';
+    const b = band(hour);
+
+    card.style.setProperty('--band', b.color);
+    card.querySelector('[data-time]').innerHTML = timeHTML(zone, t);
+    card.querySelector('[data-date]').textContent = dateStr;
+    card.querySelector('[data-offset]').textContent = off;
+    card.querySelector('[data-dot]').style.left = ((hour/24)*100) + '%';
+    card.querySelector('[data-icon]').innerHTML = b.day ? '&#9728;' : '&#127769;';
+    card.querySelector('[data-label]').textContent = b.name;
+
+    if(card.classList.contains('analog')){
+      const ms = t.getMilliseconds();
+      const fracSecond = second + ms/1000;
+      const hh = ((hour%12) + minute/60 + fracSecond/3600) * 30;
+      const mm = (minute + fracSecond/60) * 6;
+      const ss = fracSecond * 6;
+      card.querySelector('[data-hh]').style.transform = `rotate(${hh}deg)`;
+      card.querySelector('[data-mm]').style.transform = `rotate(${mm}deg)`;
+      card.querySelector('[data-ss]').style.transform = `rotate(${ss}deg)`;
+    }
+    const tideEl = card.querySelector('[data-tide]');
+    if(tideEl) tideEl.textContent = tideState(CITIES[+card.dataset.id], t);
+  });
+  const moon = moonPhase(t);
+  moonBar.innerHTML = `${moon.emoji} ${moon.name} &middot; ${moon.illum}% illuminated`;
+  updateCompare();
+}
+
+grid.addEventListener('click', e => {
+  const removeId = e.target.dataset.remove;
+  if(removeId !== undefined){ active = active.filter(c => c.id !== +removeId); renderGrid(); tick(); saveState(); return; }
+  const analogBtn = e.target.closest('[data-analog]');
+  if(analogBtn){ const id = +analogBtn.dataset.analog; analogSet.has(id) ? analogSet.delete(id) : analogSet.add(id); renderGrid(); tick(); return; }
+  const ambientBtn = e.target.closest('[data-ambient]');
+  if(ambientBtn) toggleAmbient(+ambientBtn.dataset.ambient);
+});
+
+// Ambient soundscape synthesized in-browser (no audio files) from the city's real
+// current weather via the free, keyless Open-Meteo API.
+let audioCtx = null, currentAmbient = null, currentAmbientId = null;
+const weatherCache = new Map();
+function weatherCategory(code){
+  if(code === 0) return 'clear';
+  if([1,2,3,45,48].includes(code)) return 'cloudy';
+  if([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return 'rain';
+  if([71,73,75,77,85,86].includes(code)) return 'snow';
+  if([95,96,99].includes(code)) return 'thunder';
+  return 'clear';
+}
+async function fetchWeather(city){
+  if(weatherCache.has(city.id)) return weatherCache.get(city.id);
+  const p = fetch(`https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lng}&current_weather=true`)
+    .then(r => r.json()).then(d => weatherCategory(d.current_weather?.weathercode ?? 0)).catch(() => 'clear');
+  weatherCache.set(city.id, p);
+  return p;
+}
+function stopAmbient(){
+  if(currentAmbient){ try{ currentAmbient.noise.stop(); }catch(e){} currentAmbient = null; }
+  currentAmbientId = null;
+  document.querySelectorAll('[data-ambient]').forEach(b => b.setAttribute('aria-pressed','false'));
+}
+function playAmbient(category){
+  const ctx = audioCtx || (audioCtx = new (window.AudioContext || window.webkitAudioContext)());
+  const bufferSize = 2 * ctx.sampleRate;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for(let i=0;i<bufferSize;i++) data[i] = Math.random()*2-1;
+  const noise = ctx.createBufferSource(); noise.buffer = buffer; noise.loop = true;
+  const filter = ctx.createBiquadFilter();
+  const gain = ctx.createGain();
+  const cfg = {clear:['lowpass',2200,.05], cloudy:['bandpass',700,.1], rain:['highpass',1000,.16], snow:['lowpass',500,.07], thunder:['lowpass',350,.22]}[category] || ['lowpass',2000,.05];
+  filter.type = cfg[0]; filter.frequency.value = cfg[1]; gain.gain.value = cfg[2];
+  noise.connect(filter).connect(gain).connect(ctx.destination);
+  noise.start();
+  currentAmbient = {noise, gain, ctx};
+}
+async function toggleAmbient(id){
+  const btn = document.querySelector(`[data-ambient="${id}"]`);
+  if(currentAmbientId === id){ stopAmbient(); return; }
+  stopAmbient();
+  currentAmbientId = id;
+  if(btn) btn.setAttribute('aria-pressed','true');
+  const category = await fetchWeather(CITIES[id]);
+  if(currentAmbientId !== id) return;
+  playAmbient(category);
+}
+
+grid.addEventListener('dragstart', e => {
+  const card = e.target.closest('.card');
+  if(!card || !editMode) return;
+  dragId = +card.dataset.id;
+  card.classList.add('dragging');
+});
+grid.addEventListener('dragend', e => {
+  const card = e.target.closest('.card');
+  if(card) card.classList.remove('dragging');
+  dragId = null;
+  saveState();
+});
+grid.addEventListener('dragover', e => {
+  if(dragId === null) return;
+  e.preventDefault();
+  const card = e.target.closest('.card');
+  if(!card) return;
+  const overId = +card.dataset.id;
+  if(overId === dragId) return;
+  const from = active.findIndex(c => c.id === dragId), to = active.findIndex(c => c.id === overId);
+  if(from < 0 || to < 0 || from === to) return;
+  const [item] = active.splice(from,1);
+  active.splice(to,0,item);
+  renderGrid(); tick();
+});
+
+document.querySelectorAll('[data-format-btn]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    use12h = btn.dataset.formatBtn === '12';
+    document.querySelectorAll('[data-format-btn]').forEach(b => b.setAttribute('aria-pressed', b === btn));
+    tick();
+  });
+});
+
+pauseToggle.addEventListener('click', () => {
+  running = !running;
+  pauseToggle.setAttribute('aria-pressed', !running);
+  pauseIcon.innerHTML = running ? '&#9208;' : '&#9654;';
+  pauseLabel.textContent = running ? 'Pause' : 'Resume';
+  if(running) tick();
+});
+
+editToggle.addEventListener('click', () => {
+  editMode = !editMode;
+  app.classList.toggle('editing', editMode);
+  editToggle.setAttribute('aria-pressed', editMode);
+  editLabel.textContent = editMode ? 'Done editing' : 'Add / remove / reorder';
+  renderGrid(); tick();
+});
+
+compareToggle.addEventListener('click', () => {
+  compareMode = !compareMode;
+  app.classList.toggle('comparing', compareMode);
+  compareToggle.setAttribute('aria-pressed', compareMode);
+  compareLabel.textContent = compareMode ? 'Hide comparison' : 'Compare cities';
+  if(compareMode) updateCompare();
+});
+
+document.querySelectorAll('[data-theme-btn]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.documentElement.setAttribute('data-theme', btn.dataset.themeBtn);
+    document.querySelectorAll('[data-theme-btn]').forEach(b => b.setAttribute('aria-pressed', b === btn));
+  });
+});
+
+// Multi-language UI (also drives date/weekday locale via fmt())
+function applyLanguage(){
+  const t = I18N[uiLang] || I18N.en;
+  app.classList.toggle('wide-digits', NATIVE_DIGIT_LANGS.has(uiLang));
+  document.getElementById('liveLabel').textContent = t.live;
+  document.getElementById('appTitle').textContent = t.title;
+  pauseLabel.textContent = running ? t.pause : t.resume;
+  compareLabel.textContent = compareMode ? t.hideCompare : t.compare;
+  editLabel.textContent = editMode ? t.done : t.edit;
+  document.querySelector('.home-bar span').textContent = '\u{1F4CD} ' + t.home;
+  citySearch.placeholder = t.search;
+  lowPowerLabel.textContent = t.lowpower;
+  exportBtn.textContent = t.exportBtn;
+  deleteBtn.textContent = t.deleteBtn;
+  document.getElementById('rightsLabel').textContent = t.rights;
+  renderGrid();
+  populateCompare();
+  populateHome();
+  tick();
+}
+langSelect.addEventListener('change', () => { uiLang = langSelect.value; applyLanguage(); saveState(); });
+
+// Adjustable text size. The readout updates live during drag (cheap text change,
+// no layout shift); the actual page-wide font-size only applies on release, so the
+// slider itself never resizes out from under a mobile touch mid-drag.
+const fontSizeReadout = document.getElementById('fontSizeReadout');
+fontSizeInput.addEventListener('input', () => {
+  fontSizeReadout.textContent = fontSizeInput.value + '%';
+});
+function commitFontSize(){
+  fontScale = +fontSizeInput.value;
+  fontSizeReadout.textContent = fontScale + '%';
+  document.documentElement.style.fontSize = fontScale + '%';
+  saveState();
+}
+fontSizeInput.addEventListener('change', commitFontSize);
+fontSizeInput.addEventListener('touchend', commitFontSize);
+
+// Battery-aware low-power mode (manual toggle always available; auto only where the
+// Battery Status API is supported \u2014 it's been removed from most browsers except some Chrome builds).
+function setTickRate(ms){
+  if(tickTimer) clearInterval(tickTimer);
+  tickTimer = setInterval(tick, ms);
+}
+function applyLowPower(on){
+  lowPower = on;
+  app.classList.toggle('low-power', on);
+  lowPowerToggle.setAttribute('aria-pressed', on);
+  setTickRate(on ? 1000 : 40);
+  tick();
+}
+let lowPowerUserSet = false;
+lowPowerToggle.addEventListener('click', () => { lowPowerUserSet = true; applyLowPower(!lowPower); });
+if('getBattery' in navigator){
+  navigator.getBattery().then(battery => {
+    function checkBattery(){
+      if(lowPowerUserSet) return;
+      applyLowPower(battery.level < 0.2 && !battery.charging);
+    }
+    battery.addEventListener('levelchange', checkBattery);
+    battery.addEventListener('chargingchange', checkBattery);
+    checkBattery();
+  }).catch(() => {});
+}
+
+// One-tap export / delete of this browser's saved data
+exportBtn.addEventListener('click', () => {
+  const data = {ids: active.map(c => c.id), home: homeCityId, lang: uiLang, fontScale};
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'globus-data.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+deleteBtn.addEventListener('click', async () => {
+  if(!confirm('Delete your saved cities, home base, and preferences from this browser? This cannot be undone.')) return;
+  if(window.storage){ try{ await window.storage.delete(STORAGE_KEY); }catch(e){} }
+  active = CITIES.filter(c => DEFAULT_ACTIVE.includes(c.city));
+  homeCityId = (CITIES.find(c => c.zone === deviceZone) || CITIES.find(c => c.city === 'Kolkata')).id;
+  renderGrid(); populateHome(); tick();
+});
+
+const STORAGE_KEY = 'world-clock-state-v2';
+async function saveState(){
+  if(!window.storage) return;
+  try{ await window.storage.set(STORAGE_KEY, JSON.stringify({ids: active.map(c => c.id), home: homeCityId, lang: uiLang, fontScale})); }
+  catch(e){ /* persistence unavailable here — app still works from memory */ }
+}
+async function loadState(){
+  if(!window.storage) return;
+  try{
+    const res = await window.storage.get(STORAGE_KEY);
+    if(res && res.value){
+      const data = JSON.parse(res.value);
+      if(Array.isArray(data.ids)){ const restored = data.ids.map(id => CITIES[id]).filter(Boolean); if(restored.length) active = restored; }
+      if(typeof data.home === 'number' && CITIES[data.home]) homeCityId = data.home;
+      if(typeof data.lang === 'string' && I18N[data.lang]) uiLang = data.lang;
+      if(typeof data.fontScale === 'number') fontScale = data.fontScale;
+    }
+  }catch(e){ /* no saved state yet — keep defaults */ }
+}
+
+async function init(){
+  await loadState();
+  langSelect.value = uiLang;
+  fontSizeInput.value = fontScale;
+  fontSizeReadout.textContent = fontScale + '%';
+  document.documentElement.style.fontSize = fontScale + '%';
+  applyLanguage();
+  setTickRate(40);
+}
+init();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
